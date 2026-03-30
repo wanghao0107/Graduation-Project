@@ -50,7 +50,7 @@ CURRENT_MODEL = 'FSGNet'
 # LSSegSAMLoRA 专用配置：手动指定 LSSeg 权重路径
 # 设为 None 则自动查找 log/ 目录下最新的权重
 # ============================================================
-LSSEG_CHECKPOINT_PATH = "log/test_RITE_LSSeg 02-14 08_30/fold_4/model_weights_4.pth"  # 例如: "log/test_STARE_LSSeg 02-13 11_34/fold_0/model_weights_0.pth"
+LSSEG_CHECKPOINT_PATH = "log/test_AxonDeepSeg_SEM_LSSeg 03-02 15_55/fold_3/model_weights_3.pth"  # 例如: "log/test_STARE_LSSeg 02-13 11_34/fold_0/model_weights_0.pth"
 
 
 def suggest_params(trial):
@@ -73,12 +73,12 @@ def suggest_params(trial):
         if CURRENT_MODEL in ['LSSegSAMLoRA', 'LSSegSAMLoRA_Simple', 'LSSegMedSAM', 'LSSegMedSAM_Simple']:
             # prompt_bias: 在 logits 上加偏置，等效于降低阈值，提升召回率
             # 0.0 = 原始行为，值越大越宽松（召回率越高）
-            params["prompt_bias"] = trial.suggest_float("prompt_bias", 0.0, 3.0, step=0.5)
+            params["prompt_bias"] = trial.suggest_float("prompt_bias", -1.0, 2.0, step=0.25)
             # 【新增】端到端联合训练：是否冻结 LSSeg
             # True = 仅训练 SAM-LoRA（默认，稳定）
             # False = 端到端联合训练（梯度回传到 LSSeg，潜在提升更大但需要调参）
-            # 当前设置：强制使用端到端训练
-            params["freeze_lsseg"] = trial.suggest_categorical("freeze_lsseg", [False])  # 强制端到端
+            # 当前设置：冻结 LSSeg，仅训练 SAM-LoRA
+            params["freeze_lsseg"] = True  # 冻结 LSSeg
             # 【新增】端到端训练时的 LSSeg 学习率比例
             # 仅当 freeze_lsseg=False 时有效，LSSeg 学习率 = lr * lsseg_lr_ratio
             params["lsseg_lr_ratio"] = trial.suggest_categorical("lsseg_lr_ratio", [0.05, 0.1, 0.2])
@@ -568,11 +568,11 @@ if __name__ == '__main__':
         torch.backends.cudnn.benchmark = True
 
     config = {
-        'exp_name': 'test_STARE_FSGNet',
+        'exp_name': 'test_RITE_FSGNet',
         'outer_cv_num': 5,
         'inner_cv_num': 3,
         'random_state': 800,
-        'index_csv': 'data/idx_STARE.csv',
+        'index_csv': 'data/idx_RITE.csv',
         'image_resize': [512, 512],
         # num_epochs:sam类模型设置为70，原参数为100
         'num_epochs': 100,
