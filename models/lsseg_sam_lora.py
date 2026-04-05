@@ -24,11 +24,31 @@ from typing import Optional
 
 from models.lsseg import LSSeg
 from models.sam_lora import SAMLoRA, get_lora_sam
-import types
 import numpy as np
 
 
-class LSSegSAMLoRA(nn.Module):
+class _ResidualFusionMixin:
+    def _init_residual_fusion(self, residual_mode: str, residual_init_alpha: float) -> None:
+        self.residual_mode = residual_mode
+        if residual_mode == "conv":
+            self.fusion_head = nn.Conv2d(2, 1, kernel_size=1, bias=True)
+            with torch.no_grad():
+                self.fusion_head.weight.zero_()
+                self.fusion_head.bias.zero_()
+                self.fusion_head.weight[0, 0, 0, 0] = 1.0
+                self.fusion_head.weight[0, 1, 0, 0] = residual_init_alpha
+        elif residual_mode == "alpha":
+            self.residual_alpha = nn.Parameter(torch.tensor(float(residual_init_alpha)))
+        else:
+            raise ValueError(f"Unsupported residual_mode: {residual_mode}")
+
+    def _fuse_logits(self, lsseg_logits: torch.Tensor, sam_logits: torch.Tensor) -> torch.Tensor:
+        if self.residual_mode == "conv":
+            return self.fusion_head(torch.cat([lsseg_logits, sam_logits], dim=1))
+        return lsseg_logits + self.residual_alpha * sam_logits
+
+
+class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
     """
     LSSeg + SAM-LoRA 级联模型
     
@@ -64,11 +84,14 @@ class LSSegSAMLoRA(nn.Module):
         lsseg_channels: list = [3, 8, 8],
         use_box_prompt: bool = True,  # 是否同时使用 box prompt
         prompt_bias: float = 0.0,  # 【新增】控制 LSSeg 召回率的偏置，值越大越宽松
+        residual_mode: str = "conv",
+        residual_init_alpha: float = 0.3,
     ):
         super().__init__()
         self.target_size = target_size
         self.use_box_prompt = use_box_prompt
         self.prompt_bias = prompt_bias  # 保存偏置参数
+        self.freeze_lsseg = freeze_lsseg
         
         # ========== 1. 初始化 LSSeg ==========
         self.lsseg = LSSeg(in_channels=lsseg_channels)
@@ -101,6 +124,7 @@ class LSSegSAMLoRA(nn.Module):
         # 所以输入尺寸 = image_embedding_size * 4 = (target_size/16) * 4 = target_size/4
         # target_size=512 时，mask_prompt 应为 128x128
         self.mask_prompt_size = target_size // 4
+        self._init_residual_fusion(residual_mode, residual_init_alpha)
         
     def _preprocess_images(self, images: torch.Tensor) -> torch.Tensor:
         """将图像转换为 SAM 标准格式"""
@@ -120,6 +144,11 @@ class LSSegSAMLoRA(nn.Module):
     def _preprocess_for_lsseg(self, images: torch.Tensor) -> torch.Tensor:
         """将 uint8 [0-255] 图像转换为 LSSeg 输入格式 [0-1]"""
         return images.float() / 255.0
+
+    def _forward_lsseg(self, images: torch.Tensor) -> torch.Tensor:
+        context = torch.no_grad() if self.freeze_lsseg else torch.enable_grad()
+        with context:
+            return self.lsseg(self._preprocess_for_lsseg(images))
     
     def _generate_boxes_from_mask(self, mask: torch.Tensor, H: int, W: int) -> torch.Tensor:
         """从 logits mask 生成 bounding box（使用 sigmoid 阈值）"""
@@ -163,10 +192,7 @@ class LSSegSAMLoRA(nn.Module):
         B, C, H, W = images.shape
         
         # ========== Step 1: LSSeg 生成粗分割 Mask ==========
-        with torch.no_grad() if not any(p.requires_grad for p in self.lsseg.parameters()) else torch.enable_grad():
-            images_lsseg = self._preprocess_for_lsseg(images)
-            # LSSeg 输出 [B, 1, H, W]，是 Logits（关键：不要 sigmoid！）
-            lsseg_logits = self.lsseg(images_lsseg)
+        lsseg_logits = self._forward_lsseg(images)
         
         # ========== Step 2: 准备 SAM 输入 ==========
         images_sam = self._preprocess_images(images)
@@ -225,8 +251,8 @@ class LSSegSAMLoRA(nn.Module):
         )
         
         # ========== Step 6: 上采样回原始分辨率 ==========
-        logits = F.interpolate(low_res_masks, (H, W), mode='bilinear', align_corners=False)
-        
+        sam_logits = F.interpolate(low_res_masks, (H, W), mode='bilinear', align_corners=False)
+        logits = self._fuse_logits(lsseg_logits, sam_logits)
         return logits
 
 
@@ -234,7 +260,7 @@ class LSSegSAMLoRA(nn.Module):
 # 简化版：只使用 LSSeg 的 mask 作为 prompt，不额外使用 box
 # ============================================================
 
-class LSSegSAMLoRA_Simple(nn.Module):
+class LSSegSAMLoRA_Simple(nn.Module, _ResidualFusionMixin):
     """
     简化版：只用 LSSeg 的 mask 作为 prompt，不依赖 GT box
     更适合实际部署场景
@@ -256,10 +282,13 @@ class LSSegSAMLoRA_Simple(nn.Module):
         freeze_lsseg: bool = True,
         lsseg_channels: list = [3, 8, 8],
         prompt_bias: float = 0.0,  # 【新增】控制 LSSeg 召回率的偏置
+        residual_mode: str = "conv",
+        residual_init_alpha: float = 0.3,
     ):
         super().__init__()
         self.target_size = target_size
         self.prompt_bias = prompt_bias  # 保存偏置参数
+        self.freeze_lsseg = freeze_lsseg
         
         # LSSeg
         self.lsseg = LSSeg(in_channels=lsseg_channels)
@@ -285,6 +314,7 @@ class LSSegSAMLoRA_Simple(nn.Module):
         # SAM prompt_encoder 有 4x 下采样，所以输入尺寸 = target_size/4
         # target_size=512 时，mask_prompt 应为 128x128
         self.mask_prompt_size = target_size // 4
+        self._init_residual_fusion(residual_mode, residual_init_alpha)
     
     def _preprocess_images(self, images: torch.Tensor) -> torch.Tensor:
         images_f = images.float()
@@ -299,13 +329,17 @@ class LSSegSAMLoRA_Simple(nn.Module):
                 mode='bilinear', align_corners=False
             )
         return images_sam
+
+    def _forward_lsseg(self, images: torch.Tensor) -> torch.Tensor:
+        context = torch.no_grad() if self.freeze_lsseg else torch.enable_grad()
+        with context:
+            return self.lsseg(images.float() / 255.0)
     
     def forward(self, images: torch.Tensor, masks: Optional[torch.Tensor] = None) -> torch.Tensor:
         B, C, H, W = images.shape
         
         # LSSeg 生成粗 mask（logits，不要 sigmoid）
-        with torch.no_grad():
-            lsseg_logits = self.lsseg(images.float() / 255.0)
+        lsseg_logits = self._forward_lsseg(images)
         
         # SAM 处理
         images_sam = self._preprocess_images(images)
@@ -336,5 +370,6 @@ class LSSegSAMLoRA_Simple(nn.Module):
             multimask_output=False
         )
         
-        logits = F.interpolate(low_res_masks, (H, W), mode='bilinear', align_corners=False)
+        sam_logits = F.interpolate(low_res_masks, (H, W), mode='bilinear', align_corners=False)
+        logits = self._fuse_logits(lsseg_logits, sam_logits)
         return logits

@@ -44,7 +44,7 @@ def set_seed(seed):
 #         'LSSegSAMLoRA' | 'LSSegSAMLoRA_Simple' |
 #         'LSSegMedSAM' | 'LSSegMedSAM_Simple'
 # ============================================================
-CURRENT_MODEL = 'FSGNet'
+CURRENT_MODEL = 'LSSegSAMLoRA'
 
 # ============================================================
 # LSSegSAMLoRA 专用配置：手动指定 LSSeg 权重路径
@@ -568,16 +568,16 @@ if __name__ == '__main__':
         torch.backends.cudnn.benchmark = True
 
     config = {
-        'exp_name': 'test_RITE_FSGNet',
+        'exp_name': 'test_AxonDeepSeg_SEM_LSSegSAMLoRA',
         'outer_cv_num': 5,
         'inner_cv_num': 3,
         'random_state': 800,
-        'index_csv': 'data/idx_RITE.csv',
+        'index_csv': 'data/idx_AxonDeepSeg_SEM.csv',
         'image_resize': [512, 512],
         # num_epochs:sam类模型设置为70，原参数为100
         'num_epochs': 100,
         # n_trials:端到端训练参数更多,55
-        'n_trials': 30,
+        'n_trials': 55,
         'loss_function': dice_ce_loss(),
 
         # 【优化 2】集中配置 DataLoader 参数

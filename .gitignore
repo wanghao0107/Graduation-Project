@@ -4,3 +4,13 @@ log/
 optuna.db
 *.jpg
 *.pth
+
+# IDE
+.idea/
+
+# Windows Zone Identifier
+*:Zone.Identifier
+*.Zone.Identifier
+
+# Backup files
+*副本*

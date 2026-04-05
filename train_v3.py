@@ -87,20 +87,21 @@ def suggest_params(trial):
     - 次要参数（batch_size, weight_decay, lr_factor, step_size）：固定
     
     【优化说明】
-    - lr: 缩小范围到 [5e-5, 5e-4]，聚焦常用区间
-    - lora_r: 只保留 [4, 8]，移除 r=2（太小）和 r=16（太大）
-    - prompt_bias: 缩小范围到 [0.0, 1.5]，移除过大值
-    - lsseg_lr_ratio: 增加 0.05 和 0.15 选项
+    - lr: 进一步收紧到 [5e-5, 3e-4]
+    - lora_r: 第一轮固定为 4，先观察机制改动收益
+    - prompt_bias: 缩小到 [0.0, 1.0]
+    - lsseg_lr_ratio: 收紧为更保守的微调步长
+    - residual_init_alpha / prompt curriculum: 转为新的搜索重点
     """
     if CURRENT_MODEL in ['SAMLoRA', 'LSSegSAMLoRA', 'LSSegSAMLoRA_Simple', 'LSSegMedSAM', 'LSSegMedSAM_Simple']:
         # 获取固定参数
         fixed = get_fixed_params()
 
-        # 搜索核心参数
-        lora_r = trial.suggest_categorical("lora_r", [4, 8])  # 【保留】LoRA 秩
+        # 机制刚更新，先固定 LoRA rank，优先看融合和 prompt 一致性带来的收益
+        lora_r = 4
 
         params = {
-            "lr": trial.suggest_float("lr", 5e-5, 5e-4, log=True),  # 【优化】缩小学习率范围
+            "lr": trial.suggest_float("lr", 5e-5, 3e-4, log=True),
             "lora_r": lora_r,
             "lora_alpha": lora_r * fixed["lora_alpha_ratio"],
             **fixed  # 合并固定参数
@@ -108,10 +109,11 @@ def suggest_params(trial):
 
         # LSSegSAMLoRA / LSSegMedSAM 专用参数
         if CURRENT_MODEL in ['LSSegSAMLoRA', 'LSSegSAMLoRA_Simple', 'LSSegMedSAM', 'LSSegMedSAM_Simple']:
-            # 【优化】缩小 prompt_bias 范围，移除过大值
-            params["prompt_bias"] = trial.suggest_float("prompt_bias", 0.0, 1.5, step=0.25)
-            # 【优化】增加 lsseg_lr_ratio 选项
-            params["lsseg_lr_ratio"] = trial.suggest_categorical("lsseg_lr_ratio", [0.05, 0.1, 0.15])
+            params["prompt_bias"] = trial.suggest_categorical("prompt_bias", [0.0, 0.25, 0.5, 0.75, 1.0])
+            params["lsseg_lr_ratio"] = trial.suggest_categorical("lsseg_lr_ratio", [0.03, 0.05, 0.1])
+            params["residual_init_alpha"] = trial.suggest_categorical("residual_init_alpha", [0.1, 0.3, 0.5])
+            params["gt_prompt_warmup_epochs"] = trial.suggest_categorical("gt_prompt_warmup_epochs", [5, 10, 15])
+            params["predicted_prompt_only_after"] = trial.suggest_categorical("predicted_prompt_only_after", [20, 30, 40])
 
         return params
     elif CURRENT_MODEL == 'MedSAM':
@@ -160,6 +162,7 @@ def build_model(**params):
             freeze_lsseg=params.get("freeze_lsseg", False),
             use_box_prompt=True,
             prompt_bias=params.get("prompt_bias", 0.0),
+            residual_init_alpha=params.get("residual_init_alpha", 0.3),
         )
     elif CURRENT_MODEL == 'LSSegSAMLoRA_Simple':
         if LSSEG_CHECKPOINT_PATH is not None:
@@ -183,6 +186,7 @@ def build_model(**params):
             lora_alpha=params.get("lora_alpha", 8),
             freeze_lsseg=params.get("freeze_lsseg", False),
             prompt_bias=params.get("prompt_bias", 0.0),
+            residual_init_alpha=params.get("residual_init_alpha", 0.3),
         )
     elif CURRENT_MODEL == 'LSSegMedSAM':
         if LSSEG_CHECKPOINT_PATH is not None:
@@ -274,11 +278,29 @@ def train_and_validate(params, model, train_iter, val_iter, config, device, jd_d
     if is_cascade_model and hasattr(model, 'lsseg') and hasattr(model, 'freeze_lsseg') and not model.freeze_lsseg:
         lsseg_lr_ratio = params.get("lsseg_lr_ratio", 0.1)
         print(f"Using layered learning rates: LSSeg lr = {params['lr'] * lsseg_lr_ratio:.6f}, SAM lr = {params['lr']:.6f}")
-        optimizer = torch.optim.AdamW([
-            {'params': model.lsseg.parameters(), 'lr': params["lr"] * lsseg_lr_ratio},
-            {'params': model.sam.prompt_encoder.parameters(), 'lr': params["lr"]},
-            {'params': model.sam.mask_decoder.parameters(), 'lr': params["lr"]},
-        ], weight_decay=params.get("weight_decay", 1e-4))  # 【修复】使用 params 中的 weight_decay
+        sam_image_encoder_params = [p for p in model.sam.image_encoder.parameters() if p.requires_grad]
+        sam_prompt_encoder_params = [p for p in model.sam.prompt_encoder.parameters() if p.requires_grad]
+        sam_mask_decoder_params = [p for p in model.sam.mask_decoder.parameters() if p.requires_grad]
+        extra_params = []
+        for name in ['fusion_head', 'residual_alpha']:
+            if hasattr(model, name):
+                module = getattr(model, name)
+                if isinstance(module, torch.nn.Parameter):
+                    extra_params.append(module)
+                else:
+                    extra_params.extend([p for p in module.parameters() if p.requires_grad])
+
+        param_groups = [
+            {'params': [p for p in model.lsseg.parameters() if p.requires_grad], 'lr': params["lr"] * lsseg_lr_ratio},
+            {'params': sam_image_encoder_params, 'lr': params["lr"]},
+            {'params': sam_prompt_encoder_params, 'lr': params["lr"]},
+            {'params': sam_mask_decoder_params, 'lr': params["lr"]},
+        ]
+        if extra_params:
+            param_groups.append({'params': extra_params, 'lr': params["lr"]})
+        param_groups = [group for group in param_groups if group['params']]
+
+        optimizer = torch.optim.AdamW(param_groups, weight_decay=params.get("weight_decay", 1e-4))  # 【修复】使用 params 中的 weight_decay
     else:
         optimizer = torch.optim.AdamW(model.parameters(), lr=params["lr"], weight_decay=params.get("weight_decay", 1e-4))  # 【修复】使用 params 中的 weight_decay
     
@@ -301,10 +323,30 @@ def train_and_validate(params, model, train_iter, val_iter, config, device, jd_d
 
     is_sam_lora = isinstance(model,
                              (SAMLoRA, MedSAM, LSSegSAMLoRA, LSSegSAMLoRA_Simple, LSSegMedSAM, LSSegMedSAM_Simple))
+    prompt_curriculum = config.get('prompt_curriculum', {})
+    gt_prompt_warmup_epochs = params.get(
+        'gt_prompt_warmup_epochs',
+        prompt_curriculum.get('gt_prompt_warmup_epochs', 10)
+    )
+    predicted_prompt_only_after = params.get(
+        'predicted_prompt_only_after',
+        prompt_curriculum.get('predicted_prompt_only_after', 30)
+    )
+    use_prompt_curriculum = prompt_curriculum.get('enabled', True)
 
     for epoch in iterator:
         model.train()
         train_l = []
+        if not is_sam_lora or not use_prompt_curriculum:
+            gt_prompt_prob = None
+        elif epoch < gt_prompt_warmup_epochs:
+            gt_prompt_prob = 1.0
+        elif epoch < predicted_prompt_only_after:
+            transition_span = max(predicted_prompt_only_after - gt_prompt_warmup_epochs, 1)
+            progress = (epoch - gt_prompt_warmup_epochs) / transition_span
+            gt_prompt_prob = max(0.0, 1.0 - progress)
+        else:
+            gt_prompt_prob = 0.0
 
         for images, masks in train_iter:
             masks = masks.float()
@@ -313,7 +355,15 @@ def train_and_validate(params, model, train_iter, val_iter, config, device, jd_d
 
             with torch.autocast(device_type=device.type, enabled=is_cuda):
                 if is_sam_lora:
-                    preds = model(images, masks)
+                    if gt_prompt_prob is None:
+                        prompt_masks = masks
+                    elif gt_prompt_prob >= 1.0:
+                        prompt_masks = masks
+                    elif gt_prompt_prob <= 0.0:
+                        prompt_masks = None
+                    else:
+                        prompt_masks = masks if random.random() < gt_prompt_prob else None
+                    preds = model(images, prompt_masks)
                 else:
                     images = images.float() / 255.0
                     preds = model(images)
@@ -350,7 +400,17 @@ def train_and_validate(params, model, train_iter, val_iter, config, device, jd_d
         train_loss = np.mean(train_l)
 
         if verbose:
-            iterator.set_postfix(loss=f"{train_loss:.4f}", dice=f"{val_dice:.4f}", best=f"{best_dice:.4f}")
+            if not is_sam_lora or not use_prompt_curriculum:
+                prompt_mode = "fixed"
+            elif gt_prompt_prob is not None and gt_prompt_prob >= 1.0:
+                prompt_mode = "gt"
+            elif gt_prompt_prob is not None and gt_prompt_prob <= 0.0:
+                prompt_mode = "pred"
+            elif gt_prompt_prob is not None:
+                prompt_mode = "mixed"
+            else:
+                prompt_mode = "fixed"
+            iterator.set_postfix(loss=f"{train_loss:.4f}", dice=f"{val_dice:.4f}", best=f"{best_dice:.4f}", prompt=prompt_mode)
 
         if trial:
             trial.report(val_dice, step=epoch)
@@ -500,8 +560,13 @@ if __name__ == '__main__':
         'index_csv': 'data/idx_RITE.csv',
         'image_resize': [512, 512],
         'num_epochs': 100,  # 【优化】端到端训练需要更多轮次，从 70 改为 100
-        'n_trials': 50,     # 【优化】搜索空间缩小后，减少搜索次数，从 55 改为 40
+        'n_trials': 40,     # 【优化】搜索空间缩小后，减少搜索次数，从 55 改为 40
         'loss_function': dice_ce_loss(),
+        'prompt_curriculum': {
+            'enabled': True,
+            'gt_prompt_warmup_epochs': 10,
+            'predicted_prompt_only_after': 30,
+        },
 
         'loader_kwargs': {
             'num_workers': 4,
