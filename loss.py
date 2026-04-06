@@ -80,6 +80,7 @@ def cats_loss(prediction, label, l_weight=[0.,0.], device='cpu'):
 
 
 def tracing_loss(preds, labels):
+    # Currently unused by train_v2.py; kept here only for optional future experiments.
     device = preds.device
     l_trcg = cats_loss(preds, labels, [0.01, 4.], device)
     return l_trcg

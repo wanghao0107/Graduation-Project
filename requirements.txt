@@ -1,20 +1,31 @@
-albumentations
-einops
-matplotlib
-monai
-numpy
-opencv-python
-opencv-python-headless
-optuna
-pandas
-PyYAML
-scikit-learn
-scikit-image
-thop
+# Core
 torch
 torchvision
+numpy
+pandas
+scipy
+
+# Training / search
+optuna
+tqdm
+scikit-learn
+
+# Medical segmentation / metrics
+monai
 torchmetrics
+thop
+scikit-image
+
+# Data / augmentation
+albumentations
+opencv-python-headless
+matplotlib
+
+# Model dependencies
+einops
 ml-collections
 segment-anything
 peft
-scipy
+
+# Utilities
+PyYAML

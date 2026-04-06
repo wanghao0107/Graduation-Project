@@ -84,6 +84,8 @@ class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
         lsseg_channels: list = [3, 8, 8],
         use_box_prompt: bool = True,  # 是否同时使用 box prompt
         prompt_bias: float = 0.0,  # 【新增】控制 LSSeg 召回率的偏置，值越大越宽松
+        box_bias: float = 0.0,
+        box_expand_ratio: float = 0.02,
         residual_mode: str = "conv",
         residual_init_alpha: float = 0.3,
     ):
@@ -92,6 +94,8 @@ class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
         self.use_box_prompt = use_box_prompt
         self.prompt_bias = prompt_bias  # 保存偏置参数
         self.freeze_lsseg = freeze_lsseg
+        self.box_bias = box_bias
+        self.box_expand_ratio = box_expand_ratio
         
         # ========== 1. 初始化 LSSeg ==========
         self.lsseg = LSSeg(in_channels=lsseg_channels)
@@ -150,7 +154,7 @@ class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
         with context:
             return self.lsseg(self._preprocess_for_lsseg(images))
     
-    def _generate_boxes_from_mask(self, mask: torch.Tensor, H: int, W: int) -> torch.Tensor:
+    def _generate_boxes_from_mask(self, mask: torch.Tensor, H: int, W: int, threshold: float = 0.5) -> torch.Tensor:
         """从 logits mask 生成 bounding box（使用 sigmoid 阈值）"""
         # 将 logits 转为概率用于生成 box
         mask_prob = torch.sigmoid(mask)
@@ -159,18 +163,26 @@ class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
         boxes = []
         
         for i in range(B):
-            y_indices, x_indices = np.where(mask_np[i, 0] > 0.5)
+            y_indices, x_indices = np.where(mask_np[i, 0] > threshold)
             if len(y_indices) > 0:
                 x_min = int(x_indices.min())
                 x_max = int(x_indices.max())
                 y_min = int(y_indices.min())
                 y_max = int(y_indices.max())
+                box_w = max(x_max - x_min + 1, 1)
+                box_h = max(y_max - y_min + 1, 1)
+                expand_x = max(1, int(round(box_w * self.box_expand_ratio)))
+                expand_y = max(1, int(round(box_h * self.box_expand_ratio)))
                 # 添加小扰动
                 perturb = 5
                 x_min = max(0, x_min - np.random.randint(0, perturb))
                 x_max = min(W, x_max + np.random.randint(0, perturb))
                 y_min = max(0, y_min - np.random.randint(0, perturb))
                 y_max = min(H, y_max + np.random.randint(0, perturb))
+                x_min = max(0, x_min - expand_x)
+                x_max = min(W, x_max + expand_x)
+                y_min = max(0, y_min - expand_y)
+                y_max = min(H, y_max + expand_y)
             else:
                 x_min, y_min, x_max, y_max = 0, 0, W, H
             
@@ -224,11 +236,17 @@ class LSSegSAMLoRA(nn.Module, _ResidualFusionMixin):
                 # 使用 GT mask 生成 box（训练时）
                 if masks.ndim == 3:
                     masks = masks.unsqueeze(1)
-                boxes = self._generate_boxes_from_mask(masks.float(), H, W)
+                gt_box_logits = torch.where(
+                    masks.float() > 0,
+                    torch.full_like(masks.float(), 8.0),
+                    torch.full_like(masks.float(), -8.0)
+                )
+                boxes = self._generate_boxes_from_mask(gt_box_logits, H, W, threshold=0.5)
             else:
                 # 使用 LSSeg 的 mask 生成 box（推理时）
-                # 传入 lsseg_logits，函数内部会 sigmoid 转为概率
-                boxes = self._generate_boxes_from_mask(lsseg_logits, H, W)
+                # 传入高召回的 boosted logits，保证 mask prompt 与 box prompt 语义更一致
+                box_logits = boosted_logits + self.box_bias
+                boxes = self._generate_boxes_from_mask(box_logits, H, W, threshold=0.5)
         
         # ========== Step 5: SAM 三步推理 ==========
         # 1. Image Encoder

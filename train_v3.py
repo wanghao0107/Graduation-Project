@@ -25,7 +25,7 @@ from models.sam_lora import SAMLoRA
 from models.medsam import MedSAM
 from models.lsseg_sam_lora import LSSegSAMLoRA, LSSegSAMLoRA_Simple
 from models.lsseg_medsam import LSSegMedSAM, LSSegMedSAM_Simple
-from loss import tracing_loss, dice_ce_loss
+from loss import dice_ce_loss
 from dataset import ImageSegDataset, read_index_csv
 from eval import evaluate
 from utils import aggregate_metrics, plot_curve
@@ -45,7 +45,20 @@ CURRENT_MODEL = 'LSSegSAMLoRA'
 # ============================================================
 # LSSegSAMLoRA 专用配置：手动指定 LSSeg 权重路径
 # ============================================================
-LSSEG_CHECKPOINT_PATH = "log/test_RITE_lsseg 03-10 10_09/fold_4/model_weights_4.pth"
+LSSEG_CHECKPOINT_PATH = "log/test_HRF_LSSeg 02-14 21_39/fold_2/model_weights_2.pth"
+
+
+def with_loss_suffix(exp_name: str, config) -> str:
+    suffix_map = {
+        'dice_ce': 'DiceCE',
+    }
+    loss_fn = config.get('loss_function')
+    if isinstance(loss_fn, type(dice_ce_loss())):
+        loss_name = 'dice_ce'
+    else:
+        loss_name = 'dice_ce'
+    suffix = suffix_map.get(loss_name, loss_name)
+    return exp_name if exp_name.endswith(f'_{suffix}') else f'{exp_name}_{suffix}'
 
 
 def get_fixed_params():
@@ -112,9 +125,10 @@ def suggest_params(trial):
             params["prompt_bias"] = trial.suggest_categorical("prompt_bias", [0.0, 0.25, 0.5, 0.75, 1.0])
             params["lsseg_lr_ratio"] = trial.suggest_categorical("lsseg_lr_ratio", [0.03, 0.05, 0.1])
             params["residual_init_alpha"] = trial.suggest_categorical("residual_init_alpha", [0.1, 0.3, 0.5])
+            params["box_bias"] = trial.suggest_categorical("box_bias", [0.0, 0.25, 0.5])
+            params["box_expand_ratio"] = trial.suggest_categorical("box_expand_ratio", [0.01, 0.02, 0.04])
             params["gt_prompt_warmup_epochs"] = trial.suggest_categorical("gt_prompt_warmup_epochs", [5, 10, 15])
             params["predicted_prompt_only_after"] = trial.suggest_categorical("predicted_prompt_only_after", [20, 30, 40])
-
         return params
     elif CURRENT_MODEL == 'MedSAM':
         lora_r = trial.suggest_categorical("lora_r", [0, 2, 4, 8])
@@ -162,6 +176,8 @@ def build_model(**params):
             freeze_lsseg=params.get("freeze_lsseg", False),
             use_box_prompt=True,
             prompt_bias=params.get("prompt_bias", 0.0),
+            box_bias=params.get("box_bias", 0.0),
+            box_expand_ratio=params.get("box_expand_ratio", 0.02),
             residual_init_alpha=params.get("residual_init_alpha", 0.3),
         )
     elif CURRENT_MODEL == 'LSSegSAMLoRA_Simple':
@@ -553,14 +569,14 @@ if __name__ == '__main__':
 
     config = {
         # 【优化】实验名称：明确标注端到端训练
-        'exp_name': 'test_RITE_LSSegSAMLoRA',
+        'exp_name': 'test_HRF_LSSegSAMLoRA',
         'outer_cv_num': 5,
         'inner_cv_num': 3,
         'random_state': 800,
-        'index_csv': 'data/idx_RITE.csv',
+        'index_csv': 'data/idx_HRF.csv',
         'image_resize': [512, 512],
-        'num_epochs': 100,  # 【优化】端到端训练需要更多轮次，从 70 改为 100
-        'n_trials': 40,     # 【优化】搜索空间缩小后，减少搜索次数，从 55 改为 40
+        'num_epochs': 70,  # 【优化】端到端训练需要更多轮次，从 70 改为 100
+        'n_trials': 40,     # 【当前配置】Optuna 搜索次数设为 40
         'loss_function': dice_ce_loss(),
         'prompt_curriculum': {
             'enabled': True,
@@ -575,6 +591,8 @@ if __name__ == '__main__':
             'prefetch_factor': 2
         }
     }
+
+    config['exp_name'] = with_loss_suffix(config['exp_name'], config)
 
     set_seed(config['random_state'])
 
