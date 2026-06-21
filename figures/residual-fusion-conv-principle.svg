@@ -1,0 +1,102 @@
+<svg width="1600" height="860" viewBox="0 0 1600 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .subtitle { font: 500 18px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #526d84; }
+      .section { font: 700 22px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .label { font: 600 19px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .small { font: 500 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #4a657b; }
+      .tiny { font: 500 13px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #5e788e; }
+      .code { font: 600 16px 'Consolas', 'Menlo', monospace; fill: #1d3b59; }
+      .eq { font: 600 22px 'Cambria Math', 'Times New Roman', serif; fill: #17324d; }
+      .box { stroke: #3c607d; stroke-width: 2.4; rx: 20; ry: 20; }
+      .arrow { stroke: #3c607d; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 8 7; }
+      .blue { fill: #dceefe; }
+      .green { fill: #ddf4ea; }
+      .purple { fill: #ece7ff; }
+      .pink { fill: #fde8ef; }
+      .yellow { fill: #fff7cc; }
+      .soft { fill: #f7fafc; }
+      .note { fill: #fffdf8; stroke: #c9aa6d; stroke-width: 1.8; rx: 14; ry: 14; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3c607d"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="860" fill="#ffffff"/>
+  <text x="800" y="56" text-anchor="middle" class="title">卷积残差融合结构图</text>
+  <text x="800" y="86" text-anchor="middle" class="subtitle">以粗分割结果为主分支、以精细分割结果为修正分支的可学习融合方式</text>
+
+  <!-- Input branches -->
+  <rect x="90" y="190" width="280" height="130" class="box green"/>
+  <text x="230" y="232" text-anchor="middle" class="section">主分支输出</text>
+  <text x="230" y="264" text-anchor="middle" class="label">LSSeg 粗分割结果</text>
+  <text x="230" y="292" text-anchor="middle" class="code">粗分割响应  [B,1,H,W]</text>
+
+  <rect x="90" y="500" width="280" height="130" class="box purple"/>
+  <text x="230" y="542" text-anchor="middle" class="section">修正分支输出</text>
+  <text x="230" y="574" text-anchor="middle" class="label">SAM-LoRA 精细分割结果</text>
+  <text x="230" y="602" text-anchor="middle" class="code">精细分割响应  [B,1,H,W]</text>
+
+  <!-- concat -->
+  <line x1="370" y1="255" x2="520" y2="255" class="arrow"/>
+  <line x1="370" y1="565" x2="520" y2="565" class="arrow"/>
+  <line x1="520" y1="255" x2="520" y2="395" class="arrow"/>
+  <line x1="520" y1="565" x2="520" y2="425" class="arrow"/>
+
+  <rect x="550" y="340" width="260" height="140" class="box blue"/>
+  <text x="680" y="380" text-anchor="middle" class="section">通道拼接</text>
+  <text x="680" y="414" text-anchor="middle" class="small">将两路分割响应按通道维拼接</text>
+  <text x="680" y="444" text-anchor="middle" class="code">拼接特征  [B,2,H,W]</text>
+
+  <!-- 1x1 conv -->
+  <line x1="810" y1="410" x2="930" y2="410" class="arrow"/>
+  <rect x="930" y="310" width="260" height="200" class="box pink"/>
+  <text x="1060" y="350" text-anchor="middle" class="section">1×1 卷积融合层</text>
+  <text x="1060" y="386" text-anchor="middle" class="small">学习两路分割响应的组合权重</text>
+  <text x="1060" y="416" text-anchor="middle" class="code">二维输入通道 → 一维输出通道</text>
+  <text x="1060" y="452" text-anchor="middle" class="small">实现主分支保留与修正分支补偿</text>
+  <text x="1060" y="480" text-anchor="middle" class="small">输出保持单通道分割表示</text>
+
+  <!-- output -->
+  <line x1="1190" y1="410" x2="1330" y2="410" class="arrow"/>
+  <rect x="1330" y="350" width="220" height="120" class="box blue"/>
+  <text x="1440" y="390" text-anchor="middle" class="section">最终输出</text>
+  <text x="1440" y="422" text-anchor="middle" class="code">融合结果  [B,1,H,W]</text>
+
+  <!-- Equation -->
+  <rect x="120" y="710" width="1360" height="90" class="note"/>
+  <text x="800" y="760" text-anchor="middle" class="eq">Y = Conv1×1([Y_l, Y_s])</text>
+
+  <!-- Init details -->
+  <rect x="520" y="120" width="630" height="140" class="note"/>
+  <text x="835" y="158" text-anchor="middle" class="section">默认初始化含义</text>
+  <text x="835" y="190" text-anchor="middle" class="small">融合层初始化偏向主分支：</text>
+  <text x="835" y="220" text-anchor="middle" class="code">w_l = 1.0,   w_s = α</text>
+  <text x="835" y="246" text-anchor="middle" class="small">训练初期近似为：Y ≈ Y_l + α·Y_s</text>
+
+  <!-- Interpretation -->
+  <rect x="90" y="350" width="280" height="90" class="note"/>
+  <text x="230" y="384" text-anchor="middle" class="label">设计目的</text>
+  <text x="230" y="414" text-anchor="middle" class="small">保留 LSSeg 的主结构稳定性</text>
+
+  <rect x="90" y="660" width="280" height="90" class="note"/>
+  <text x="230" y="694" text-anchor="middle" class="label">修正角色</text>
+  <text x="230" y="724" text-anchor="middle" class="small">SAM 只负责局部细化与补偿</text>
+
+  <rect x="1220" y="150" width="290" height="110" class="note"/>
+  <text x="1365" y="186" text-anchor="middle" class="label">为什么不是直接替代？</text>
+  <text x="1365" y="214" text-anchor="middle" class="small">避免后端分支破坏粗分割已建立的</text>
+  <text x="1365" y="238" text-anchor="middle" class="small">主干结构与分支连续性</text>
+
+  <rect x="1240" y="520" width="290" height="120" class="note"/>
+  <text x="1385" y="556" text-anchor="middle" class="label">融合优势</text>
+  <text x="1385" y="586" text-anchor="middle" class="small">1. 可退化为 LSSeg 基线</text>
+  <text x="1385" y="612" text-anchor="middle" class="small">2. 允许 SAM 逐步学习有效修正量</text>
+
+  <!-- subtle guide arrows -->
+  <line x1="1060" y1="260" x2="1060" y2="310" class="arrow dash"/>
+  <line x1="1440" y1="470" x2="1440" y2="520" class="arrow dash"/>
+</svg>

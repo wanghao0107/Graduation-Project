@@ -1,0 +1,177 @@
+<svg width="1800" height="1120" viewBox="0 0 1800 1120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .subtitle { font: 500 18px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #4b677f; }
+      .section { font: 700 22px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .label { font: 600 18px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .small { font: 500 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #466178; }
+      .tiny { font: 500 13px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #587087; }
+      .code { font: 600 15px 'Consolas', 'Menlo', monospace; fill: #1d3b59; }
+      .box { stroke: #355c7d; stroke-width: 2.5; rx: 18; ry: 18; }
+      .blue { fill: #dceefe; }
+      .green { fill: #ddf4ea; }
+      .orange { fill: #fff0da; }
+      .purple { fill: #ece7ff; }
+      .pink { fill: #fde8ef; }
+      .gray { fill: #edf2f7; }
+      .yellow { fill: #fff8cf; }
+      .soft { fill: #f7fafc; }
+      .note { fill: #fffdf7; stroke: #c7a96b; stroke-width: 2; rx: 14; ry: 14; }
+      .arrow { stroke: #355c7d; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 9 7; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#355c7d"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1800" height="1120" fill="#ffffff"/>
+  <text x="900" y="56" text-anchor="middle" class="title">LSSeg-SAM-LoRA 数据流图</text>
+  <text x="900" y="86" text-anchor="middle" class="subtitle">从数据索引、样本读取、粗分割、Prompt 生成到精细分割与评价的完整流程</text>
+
+  <!-- Left data source -->
+  <text x="220" y="145" text-anchor="middle" class="section">数据准备</text>
+  <rect x="70" y="170" width="300" height="105" class="box blue"/>
+  <text x="220" y="208" text-anchor="middle" class="label">索引文件</text>
+  <text x="220" y="236" text-anchor="middle" class="code">data/idx_*.csv</text>
+  <text x="220" y="262" text-anchor="middle" class="small">记录图像路径与对应 mask 路径</text>
+
+  <rect x="70" y="320" width="300" height="130" class="box blue"/>
+  <text x="220" y="358" text-anchor="middle" class="label">ImageSegDataset</text>
+  <text x="220" y="386" text-anchor="middle" class="small">读取 image / mask</text>
+  <text x="220" y="412" text-anchor="middle" class="small">resize + augmentation</text>
+  <text x="220" y="438" text-anchor="middle" class="code">images, masks</text>
+
+  <rect x="70" y="495" width="300" height="112" class="box blue"/>
+  <text x="220" y="533" text-anchor="middle" class="label">DataLoader</text>
+  <text x="220" y="561" text-anchor="middle" class="small">batch / shuffle / workers</text>
+  <text x="220" y="587" text-anchor="middle" class="code">[B,3,H,W], [B,H,W]</text>
+
+  <!-- Center training path -->
+  <text x="860" y="145" text-anchor="middle" class="section">训练阶段数据流</text>
+  <rect x="480" y="170" width="250" height="115" class="box soft"/>
+  <text x="605" y="208" text-anchor="middle" class="label">批数据输入</text>
+  <text x="605" y="236" text-anchor="middle" class="small">images: uint8 [0,255]</text>
+  <text x="605" y="262" text-anchor="middle" class="small">masks: 0/1 label</text>
+
+  <rect x="790" y="170" width="250" height="115" class="box green"/>
+  <text x="915" y="208" text-anchor="middle" class="label">LSSeg 粗分割</text>
+  <text x="915" y="236" text-anchor="middle" class="small">float / 255 预处理</text>
+  <text x="915" y="262" text-anchor="middle" class="code">lsseg_logits [B,1,H,W]</text>
+
+  <rect x="1100" y="150" width="280" height="155" class="box orange"/>
+  <text x="1240" y="190" text-anchor="middle" class="label">Prompt 构造</text>
+  <text x="1240" y="220" text-anchor="middle" class="small">boosted_logits = lsseg_logits + prompt_bias</text>
+  <text x="1240" y="248" text-anchor="middle" class="small">下采样得到 mask prompt</text>
+  <text x="1240" y="276" text-anchor="middle" class="small">根据 GT / predicted mask 构造 box prompt</text>
+
+  <rect x="1450" y="170" width="270" height="115" class="box purple"/>
+  <text x="1585" y="208" text-anchor="middle" class="label">SAM-LoRA 精细分割</text>
+  <text x="1585" y="236" text-anchor="middle" class="small">image encoder + prompt encoder</text>
+  <text x="1585" y="262" text-anchor="middle" class="small">mask decoder</text>
+
+  <!-- Middle outputs -->
+  <rect x="790" y="350" width="250" height="100" class="box green"/>
+  <text x="915" y="388" text-anchor="middle" class="label">粗分割输出</text>
+  <text x="915" y="416" text-anchor="middle" class="code">lsseg_logits</text>
+
+  <rect x="1450" y="350" width="270" height="100" class="box purple"/>
+  <text x="1585" y="388" text-anchor="middle" class="label">精细分割输出</text>
+  <text x="1585" y="416" text-anchor="middle" class="code">sam_logits</text>
+
+  <rect x="1110" y="500" width="260" height="110" class="box pink"/>
+  <text x="1240" y="538" text-anchor="middle" class="label">残差融合</text>
+  <text x="1240" y="566" text-anchor="middle" class="small">conv / alpha mode</text>
+  <text x="1240" y="592" text-anchor="middle" class="code">final_logits [B,1,H,W]</text>
+
+  <rect x="1110" y="660" width="260" height="110" class="box yellow"/>
+  <text x="1240" y="698" text-anchor="middle" class="label">损失计算</text>
+  <text x="1240" y="726" text-anchor="middle" class="small">DiceCE loss</text>
+  <text x="1240" y="752" text-anchor="middle" class="small">与 GT mask 比较</text>
+
+  <rect x="1110" y="820" width="260" height="120" class="box yellow"/>
+  <text x="1240" y="858" text-anchor="middle" class="label">优化更新</text>
+  <text x="1240" y="886" text-anchor="middle" class="small">AdamW + StepLR + AMP</text>
+  <text x="1240" y="912" text-anchor="middle" class="small">分层学习率更新各模块参数</text>
+
+  <!-- Validation branch -->
+  <text x="505" y="720" text-anchor="middle" class="section">验证 / 测试阶段数据流</text>
+  <rect x="410" y="750" width="190" height="100" class="box gray"/>
+  <text x="505" y="788" text-anchor="middle" class="label">输入图像</text>
+  <text x="505" y="816" text-anchor="middle" class="small">仅输入 images</text>
+
+  <rect x="690" y="750" width="270" height="100" class="box gray"/>
+  <text x="825" y="788" text-anchor="middle" class="label">自动 Prompt 构造</text>
+  <text x="825" y="816" text-anchor="middle" class="small">不使用 GT，仅由 LSSeg 预测生成</text>
+
+  <rect x="1030" y="750" width="420" height="100" class="box gray"/>
+  <text x="1240" y="788" text-anchor="middle" class="label">前向推理</text>
+  <text x="1240" y="816" text-anchor="middle" class="small">LSSeg → Prompt → SAM-LoRA → Fusion → sigmoid / threshold</text>
+
+  <rect x="1520" y="735" width="210" height="130" class="box gray"/>
+  <text x="1625" y="773" text-anchor="middle" class="label">评价与保存</text>
+  <text x="1625" y="801" text-anchor="middle" class="small">Dice / mIoU / AP / clDice</text>
+  <text x="1625" y="827" text-anchor="middle" class="small">ASSD / 95HD / ODS</text>
+  <text x="1625" y="853" text-anchor="middle" class="small">metrics.csv / final_metrics.csv</text>
+
+  <!-- Search branch -->
+  <rect x="70" y="710" width="300" height="170" class="note"/>
+  <text x="220" y="746" text-anchor="middle" class="label">Optuna 超参数搜索</text>
+  <text x="220" y="776" text-anchor="middle" class="small">搜索学习率、prompt_bias、lsseg_lr_ratio、</text>
+  <text x="220" y="804" text-anchor="middle" class="small">residual_init_alpha、box_bias、</text>
+  <text x="220" y="832" text-anchor="middle" class="small">box_expand_ratio、prompt curriculum 等参数</text>
+  <text x="220" y="860" text-anchor="middle" class="small">每个 fold 先搜索，再用最佳参数重训</text>
+
+  <!-- Prompt curriculum note -->
+  <rect x="1450" y="500" width="270" height="110" class="note"/>
+  <text x="1585" y="538" text-anchor="middle" class="label">Prompt Curriculum</text>
+  <text x="1585" y="566" text-anchor="middle" class="small">前期：GT prompt</text>
+  <text x="1585" y="592" text-anchor="middle" class="small">中期：GT / predicted 混合</text>
+
+  <rect x="1450" y="620" width="270" height="100" class="note"/>
+  <text x="1585" y="658" text-anchor="middle" class="small">后期：predicted prompt</text>
+  <text x="1585" y="686" text-anchor="middle" class="small">缓解训练 / 推理分布不一致</text>
+
+  <!-- Arrows -->
+  <line x1="370" y1="222" x2="370" y2="385" class="arrow"/>
+  <line x1="370" y1="385" x2="370" y2="551" class="arrow"/>
+  <line x1="370" y1="551" x2="480" y2="228" class="arrow"/>
+
+  <line x1="730" y1="228" x2="790" y2="228" class="arrow"/>
+  <line x1="1040" y1="228" x2="1100" y2="228" class="arrow"/>
+  <line x1="1380" y1="228" x2="1450" y2="228" class="arrow"/>
+
+  <line x1="915" y1="285" x2="915" y2="350" class="arrow"/>
+  <line x1="1585" y1="285" x2="1585" y2="350" class="arrow"/>
+
+  <line x1="915" y1="450" x2="1110" y2="555" class="arrow"/>
+  <line x1="1585" y1="450" x2="1370" y2="555" class="arrow"/>
+
+  <line x1="1240" y1="610" x2="1240" y2="660" class="arrow"/>
+  <line x1="1240" y1="770" x2="1240" y2="820" class="arrow"/>
+
+  <line x1="1370" y1="228" x2="1585" y2="500" class="arrow dash"/>
+  <line x1="1450" y1="555" x2="1450" y2="665" class="arrow dash"/>
+
+  <line x1="600" y1="800" x2="690" y2="800" class="arrow"/>
+  <line x1="960" y1="800" x2="1030" y2="800" class="arrow"/>
+  <line x1="1450" y1="800" x2="1520" y2="800" class="arrow"/>
+
+  <!-- Legend -->
+  <rect x="70" y="965" width="930" height="86" class="box soft"/>
+  <text x="120" y="1000" class="label">图例</text>
+  <rect x="170" y="984" width="24" height="24" class="blue" stroke="#355c7d" stroke-width="1.5"/>
+  <text x="205" y="1001" class="small">数据读取 / 批处理</text>
+  <rect x="360" y="984" width="24" height="24" class="green" stroke="#355c7d" stroke-width="1.5"/>
+  <text x="395" y="1001" class="small">LSSeg 粗分割</text>
+  <rect x="520" y="984" width="24" height="24" class="orange" stroke="#355c7d" stroke-width="1.5"/>
+  <text x="555" y="1001" class="small">Prompt 构造</text>
+  <rect x="680" y="984" width="24" height="24" class="purple" stroke="#355c7d" stroke-width="1.5"/>
+  <text x="715" y="1001" class="small">SAM-LoRA 精细分割</text>
+  <rect x="915" y="984" width="24" height="24" class="pink" stroke="#355c7d" stroke-width="1.5"/>
+  <text x="950" y="1001" class="small">融合 / 训练模块</text>
+
+  <rect x="1060" y="965" width="670" height="86" class="note"/>
+  <text x="1395" y="998" text-anchor="middle" class="small">训练阶段同时依赖图像与标注；验证/测试阶段仅依赖图像，由粗分割结果自动生成 prompt，最终输出保存为各 fold 的 metrics 和汇总 final_metrics。</text>
+</svg>

@@ -1,0 +1,97 @@
+<svg width="1600" height="700" viewBox="0 0 1600 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #16324f; }
+      .subtitle { font: 500 19px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #4b6277; }
+      .section { font: 700 26px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .label { font: 600 20px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #17324d; }
+      .small { font: 500 17px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #425b72; }
+      .code { font: 600 17px 'Consolas', 'Menlo', monospace; fill: #1e3b59; }
+      .box { stroke: #355c7d; stroke-width: 2.4; rx: 18; ry: 18; }
+      .blue { fill: #dceefe; }
+      .green { fill: #ddf4ea; }
+      .orange { fill: #fff0da; }
+      .purple { fill: #ede6ff; }
+      .pink { fill: #fde7ef; }
+      .gray { fill: #edf2f7; }
+      .legendBox { fill: #f7fafc; stroke: #9cb2c8; stroke-width: 1.3; rx: 12; ry: 12; }
+      .arrow { stroke: #355c7d; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .dashed { stroke-dasharray: 9 7; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#355c7d"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="700" fill="#ffffff"/>
+
+  <text x="800" y="52" text-anchor="middle" class="title">LSSeg-SAM-LoRA 级联架构</text>
+  <text x="800" y="82" text-anchor="middle" class="subtitle">粗分割先验 → 自动提示构造 → 基础模型细化 → 残差融合</text>
+
+  <!-- Row 1 -->
+  <rect x="60" y="170" width="220" height="120" class="box blue"/>
+  <text x="170" y="214" text-anchor="middle" class="section">输入图像</text>
+  <text x="170" y="246" text-anchor="middle" class="small">视网膜血管 / 线状结构样本</text>
+  <text x="170" y="274" text-anchor="middle" class="code">RGB image</text>
+
+  <rect x="360" y="150" width="280" height="160" class="box green"/>
+  <text x="500" y="198" text-anchor="middle" class="section">LSSeg 粗分割</text>
+  <text x="500" y="232" text-anchor="middle" class="small">提取主干结构与主要分支</text>
+  <text x="500" y="262" text-anchor="middle" class="small">生成粗分割 logits</text>
+  <text x="500" y="290" text-anchor="middle" class="code">lsseg_logits</text>
+
+  <rect x="730" y="150" width="280" height="160" class="box orange"/>
+  <text x="870" y="198" text-anchor="middle" class="section">Prompt 构造</text>
+  <text x="870" y="232" text-anchor="middle" class="small">高召回提示优化</text>
+  <text x="870" y="262" text-anchor="middle" class="small">生成 mask prompt / box prompt</text>
+  <text x="870" y="290" text-anchor="middle" class="code">prompt_bias + box prompt</text>
+
+  <rect x="1100" y="150" width="280" height="160" class="box purple"/>
+  <text x="1240" y="198" text-anchor="middle" class="section">SAM-LoRA 细化</text>
+  <text x="1240" y="232" text-anchor="middle" class="small">图像编码 + 提示编码 + 掩膜解码</text>
+  <text x="1240" y="262" text-anchor="middle" class="small">修正边界与细小分支</text>
+  <text x="1240" y="290" text-anchor="middle" class="code">sam_logits</text>
+
+  <!-- Row 2 -->
+  <rect x="930" y="420" width="260" height="130" class="box blue"/>
+  <text x="1060" y="466" text-anchor="middle" class="section">残差融合</text>
+  <text x="1060" y="498" text-anchor="middle" class="small">保留 LSSeg 主输出</text>
+  <text x="1060" y="526" text-anchor="middle" class="small">叠加 SAM 局部修正</text>
+
+  <rect x="1280" y="420" width="260" height="130" class="box gray"/>
+  <text x="1410" y="466" text-anchor="middle" class="section">最终结果</text>
+  <text x="1410" y="500" text-anchor="middle" class="small">输出线状结构分割掩膜</text>
+  <text x="1410" y="528" text-anchor="middle" class="code">final_logits</text>
+
+  <!-- Main arrows -->
+  <line x1="280" y1="230" x2="360" y2="230" class="arrow"/>
+  <line x1="640" y1="230" x2="730" y2="230" class="arrow"/>
+  <line x1="1010" y1="230" x2="1100" y2="230" class="arrow"/>
+  <line x1="1190" y1="485" x2="1280" y2="485" class="arrow"/>
+
+  <!-- Routing to fusion -->
+  <path d="M 1240 310 L 1240 360 L 1110 360 L 1110 420" class="arrow"/>
+  <path d="M 500 310 L 500 390 L 1010 390 L 1010 420" class="arrow dashed"/>
+
+  <!-- Notes -->
+  <rect x="120" y="420" width="300" height="120" class="legendBox"/>
+  <text x="270" y="458" text-anchor="middle" class="label">设计思路</text>
+  <text x="270" y="488" text-anchor="middle" class="small">粗分割负责结构保底</text>
+  <text x="270" y="514" text-anchor="middle" class="small">精细分割负责局部修正</text>
+
+  <rect x="470" y="420" width="320" height="120" class="legendBox"/>
+  <text x="630" y="458" text-anchor="middle" class="label">训练要点</text>
+  <text x="630" y="488" text-anchor="middle" class="small">自动提示构造与提示渐进训练</text>
+  <text x="630" y="514" text-anchor="middle" class="small">提高训练与推理的一致性</text>
+
+  <!-- Legend -->
+  <rect x="80" y="610" width="860" height="54" class="legendBox"/>
+  <rect x="110" y="625" width="22" height="22" class="blue" stroke="#355c7d" stroke-width="1.2"/>
+  <text x="144" y="641" class="small">输入 / 融合 / 输出</text>
+  <rect x="280" y="625" width="22" height="22" class="green" stroke="#355c7d" stroke-width="1.2"/>
+  <text x="314" y="641" class="small">LSSeg 粗分割</text>
+  <rect x="450" y="625" width="22" height="22" class="orange" stroke="#355c7d" stroke-width="1.2"/>
+  <text x="484" y="641" class="small">Prompt 构造</text>
+  <rect x="620" y="625" width="22" height="22" class="purple" stroke="#355c7d" stroke-width="1.2"/>
+  <text x="654" y="641" class="small">SAM-LoRA 细化</text>
+</svg>

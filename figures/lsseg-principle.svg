@@ -1,0 +1,56 @@
+<svg width="1200" height="440" viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .frame { fill:#ffffff; stroke:#111111; stroke-width:1.6; rx:12; ry:12; }
+      .stage { fill:#f2f2f2; stroke:#777777; stroke-width:1.2; rx:10; ry:10; }
+      .box { fill:#ffffff; stroke:#222222; stroke-width:1.8; rx:12; ry:12; }
+      .label { font:700 20px 'Microsoft YaHei','PingFang SC',sans-serif; fill:#111111; }
+      .text { font:500 14px 'Microsoft YaHei','PingFang SC',sans-serif; fill:#222222; }
+      .arrow { stroke:#111111; stroke-width:2.2; fill:none; marker-end:url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#111111"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="440" fill="#ffffff"/>
+  <rect x="18" y="22" width="1164" height="396" class="frame"/>
+  <rect x="48" y="48" width="1104" height="46" class="stage"/>
+  <text x="600" y="78" text-anchor="middle" class="label">LSSeg 网络结构示意</text>
+
+  <rect x="64" y="170" width="150" height="92" class="box"/>
+  <text x="139" y="206" text-anchor="middle" class="label">输入图像</text>
+  <text x="139" y="232" text-anchor="middle" class="text">X</text>
+
+  <rect x="286" y="104" width="196" height="92" class="box"/>
+  <text x="384" y="140" text-anchor="middle" class="label">FDM1</text>
+  <text x="384" y="166" text-anchor="middle" class="text">RFCAConv + Dense + Down</text>
+
+  <rect x="286" y="238" width="196" height="92" class="box"/>
+  <text x="384" y="274" text-anchor="middle" class="label">FDM2 / FDM3</text>
+  <text x="384" y="300" text-anchor="middle" class="text">多级特征抽取与压缩</text>
+
+  <rect x="560" y="170" width="170" height="92" class="box"/>
+  <text x="645" y="206" text-anchor="middle" class="label">瓶颈特征</text>
+  <text x="645" y="232" text-anchor="middle" class="text">深层语义表示</text>
+
+  <rect x="808" y="104" width="196" height="92" class="box"/>
+  <text x="906" y="140" text-anchor="middle" class="label">RM + GSC</text>
+  <text x="906" y="166" text-anchor="middle" class="text">门控跳跃连接融合</text>
+
+  <rect x="808" y="238" width="196" height="92" class="box"/>
+  <text x="906" y="274" text-anchor="middle" class="label">逐级重建</text>
+  <text x="906" y="300" text-anchor="middle" class="text">恢复空间分辨率</text>
+
+  <rect x="1078" y="170" width="88" height="92" class="box"/>
+  <text x="1122" y="206" text-anchor="middle" class="label">输出</text>
+  <text x="1122" y="232" text-anchor="middle" class="text">logits</text>
+
+  <line x1="214" y1="216" x2="286" y2="150" class="arrow"/>
+  <line x1="214" y1="216" x2="286" y2="284" class="arrow"/>
+  <line x1="482" y1="150" x2="560" y2="194" class="arrow"/>
+  <line x1="482" y1="284" x2="560" y2="238" class="arrow"/>
+  <line x1="730" y1="194" x2="808" y2="150" class="arrow"/>
+  <line x1="730" y1="238" x2="808" y2="284" class="arrow"/>
+  <line x1="1004" y1="150" x2="1078" y2="194" class="arrow"/>
+  <line x1="1004" y1="284" x2="1078" y2="238" class="arrow"/>
+</svg>

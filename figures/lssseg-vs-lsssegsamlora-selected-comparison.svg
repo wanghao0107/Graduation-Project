@@ -1,0 +1,194 @@
+<svg width="1680" height="1020" viewBox="0 0 1680 1020" xmlns="http://www.w3.org/2000/svg">
+<defs><style>
+.title{font:700 34px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#17324d;}
+.subtitle{font:500 18px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#516c84;}
+.paneltitle{font:700 22px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#17324d;}
+.label{font:600 16px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#17324d;}
+.small{font:500 13px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#516c84;}
+.tiny{font:500 12px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#516c84;}
+</style></defs>
+<rect x="0" y="0" width="1680" height="1020" fill="#ffffff"/>
+<text x="840.0" y="52" text-anchor="middle" class="title">LSSeg 与 LSSegSAMLoRA 指标对比图</text>
+<text x="840.0" y="82" text-anchor="middle" class="subtitle">基于论文第四章所选 10 个日志，展示 5 个数据集上的 4 项关键指标</text>
+<rect x="620" y="102" width="18" height="18" fill="#7fb3ff" rx="4" ry="4"/>
+<text x="646" y="116" class="label">LSSeg</text>
+<rect x="760" y="102" width="18" height="18" fill="#ff9d76" rx="4" ry="4"/>
+<text x="786" y="116" class="label">LSSegSAMLoRA</text>
+<rect x="70" y="140" width="720" height="360" rx="20" ry="20" fill="#f8fbfd" stroke="#d7e4ee" stroke-width="2"/>
+<text x="95" y="174" class="paneltitle">DSC ↑</text>
+<line x1="125" y1="205.0" x2="755" y2="205.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="209.0" text-anchor="end" class="tiny">0.93</text>
+<line x1="125" y1="266.2" x2="755" y2="266.2" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="270.2" text-anchor="end" class="tiny">0.70</text>
+<line x1="125" y1="327.5" x2="755" y2="327.5" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="331.5" text-anchor="end" class="tiny">0.46</text>
+<line x1="125" y1="388.8" x2="755" y2="388.8" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="392.8" text-anchor="end" class="tiny">0.23</text>
+<line x1="125" y1="450.0" x2="755" y2="450.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="454.0" text-anchor="end" class="tiny">0.00</text>
+<line x1="125" y1="450" x2="755" y2="450" stroke="#44647d" stroke-width="2"/>
+<line x1="125" y1="205" x2="125" y2="450" stroke="#44647d" stroke-width="2"/>
+<rect x="133.0" y="243.0" width="42.0" height="207.0" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="154.0" y="235.0" text-anchor="middle" class="tiny">0.785</text>
+<rect x="183.0" y="237.0" width="42.0" height="213.0" fill="#ff9d76" rx="7" ry="7"/>
+<text x="204.0" y="229.0" text-anchor="middle" class="tiny">0.808</text>
+<text x="178.4" y="474" text-anchor="middle" class="small">STARE</text>
+<text x="178.4" y="493" text-anchor="middle" class="tiny">Δ=+0.023</text>
+<rect x="263.8" y="239.3" width="42.0" height="210.7" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="284.8" y="231.3" text-anchor="middle" class="tiny">0.799</text>
+<rect x="313.8" y="237.7" width="42.0" height="212.3" fill="#ff9d76" rx="7" ry="7"/>
+<text x="334.8" y="229.7" text-anchor="middle" class="tiny">0.805</text>
+<text x="309.2" y="474" text-anchor="middle" class="small">RITE</text>
+<text x="309.2" y="493" text-anchor="middle" class="tiny">Δ=+0.006</text>
+<rect x="394.6" y="245.9" width="42.0" height="204.1" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="415.6" y="237.9" text-anchor="middle" class="tiny">0.774</text>
+<rect x="444.6" y="240.4" width="42.0" height="209.6" fill="#ff9d76" rx="7" ry="7"/>
+<text x="465.6" y="232.4" text-anchor="middle" class="tiny">0.795</text>
+<text x="440.0" y="474" text-anchor="middle" class="small">CHASE_DB1</text>
+<text x="440.0" y="493" text-anchor="middle" class="tiny">Δ=+0.021</text>
+<rect x="525.4" y="243.3" width="42.0" height="206.7" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="546.4" y="235.3" text-anchor="middle" class="tiny">0.784</text>
+<rect x="575.4" y="242.8" width="42.0" height="207.2" fill="#ff9d76" rx="7" ry="7"/>
+<text x="596.4" y="234.8" text-anchor="middle" class="tiny">0.786</text>
+<text x="570.8" y="474" text-anchor="middle" class="small">HRF</text>
+<text x="570.8" y="493" text-anchor="middle" class="tiny">Δ=+0.002</text>
+<rect x="656.2" y="244.9" width="42.0" height="205.1" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="677.2" y="236.9" text-anchor="middle" class="tiny">0.778</text>
+<rect x="706.2" y="243.0" width="42.0" height="207.0" fill="#ff9d76" rx="7" ry="7"/>
+<text x="727.2" y="235.0" text-anchor="middle" class="tiny">0.785</text>
+<text x="701.6" y="474" text-anchor="middle" class="small">AxonDeepSeg_SEM</text>
+<text x="701.6" y="493" text-anchor="middle" class="tiny">Δ=+0.007</text>
+<rect x="890" y="140" width="720" height="360" rx="20" ry="20" fill="#f8fbfd" stroke="#d7e4ee" stroke-width="2"/>
+<text x="915" y="174" class="paneltitle">mIoU ↑</text>
+<line x1="945" y1="205.0" x2="1575" y2="205.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="209.0" text-anchor="end" class="tiny">0.85</text>
+<line x1="945" y1="266.2" x2="1575" y2="266.2" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="270.2" text-anchor="end" class="tiny">0.64</text>
+<line x1="945" y1="327.5" x2="1575" y2="327.5" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="331.5" text-anchor="end" class="tiny">0.42</text>
+<line x1="945" y1="388.8" x2="1575" y2="388.8" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="392.8" text-anchor="end" class="tiny">0.21</text>
+<line x1="945" y1="450.0" x2="1575" y2="450.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="454.0" text-anchor="end" class="tiny">0.00</text>
+<line x1="945" y1="450" x2="1575" y2="450" stroke="#44647d" stroke-width="2"/>
+<line x1="945" y1="205" x2="945" y2="450" stroke="#44647d" stroke-width="2"/>
+<rect x="953.0" y="263.5" width="42.0" height="186.5" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="974.0" y="255.5" text-anchor="middle" class="tiny">0.647</text>
+<rect x="1003.0" y="254.3" width="42.0" height="195.7" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1024.0" y="246.3" text-anchor="middle" class="tiny">0.679</text>
+<text x="998.4" y="474" text-anchor="middle" class="small">STARE</text>
+<text x="998.4" y="493" text-anchor="middle" class="tiny">Δ=+0.032</text>
+<rect x="1083.8" y="257.7" width="42.0" height="192.3" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1104.8" y="249.7" text-anchor="middle" class="tiny">0.667</text>
+<rect x="1133.8" y="255.7" width="42.0" height="194.3" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1154.8" y="247.7" text-anchor="middle" class="tiny">0.674</text>
+<text x="1129.2" y="474" text-anchor="middle" class="small">RITE</text>
+<text x="1129.2" y="493" text-anchor="middle" class="tiny">Δ=+0.007</text>
+<rect x="1214.6" y="267.5" width="42.0" height="182.5" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1235.6" y="259.5" text-anchor="middle" class="tiny">0.633</text>
+<rect x="1264.6" y="259.8" width="42.0" height="190.2" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1285.6" y="251.8" text-anchor="middle" class="tiny">0.660</text>
+<text x="1260.0" y="474" text-anchor="middle" class="small">CHASE_DB1</text>
+<text x="1260.0" y="493" text-anchor="middle" class="tiny">Δ=+0.027</text>
+<rect x="1345.4" y="263.8" width="42.0" height="186.2" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1366.4" y="255.8" text-anchor="middle" class="tiny">0.646</text>
+<rect x="1395.4" y="262.9" width="42.0" height="187.1" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1416.4" y="254.9" text-anchor="middle" class="tiny">0.649</text>
+<text x="1390.8" y="474" text-anchor="middle" class="small">HRF</text>
+<text x="1390.8" y="493" text-anchor="middle" class="tiny">Δ=+0.003</text>
+<rect x="1476.2" y="266.4" width="42.0" height="183.6" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1497.2" y="258.4" text-anchor="middle" class="tiny">0.637</text>
+<rect x="1526.2" y="263.5" width="42.0" height="186.5" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1547.2" y="255.5" text-anchor="middle" class="tiny">0.647</text>
+<text x="1521.6" y="474" text-anchor="middle" class="small">AxonDeepSeg_SEM</text>
+<text x="1521.6" y="493" text-anchor="middle" class="tiny">Δ=+0.010</text>
+<rect x="70" y="560" width="720" height="360" rx="20" ry="20" fill="#f8fbfd" stroke="#d7e4ee" stroke-width="2"/>
+<text x="95" y="594" class="paneltitle">clDice ↑</text>
+<line x1="125" y1="625.0" x2="755" y2="625.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="629.0" text-anchor="end" class="tiny">0.96</text>
+<line x1="125" y1="686.2" x2="755" y2="686.2" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="690.2" text-anchor="end" class="tiny">0.72</text>
+<line x1="125" y1="747.5" x2="755" y2="747.5" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="751.5" text-anchor="end" class="tiny">0.48</text>
+<line x1="125" y1="808.8" x2="755" y2="808.8" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="812.8" text-anchor="end" class="tiny">0.24</text>
+<line x1="125" y1="870.0" x2="755" y2="870.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="115" y="874.0" text-anchor="end" class="tiny">0.00</text>
+<line x1="125" y1="870" x2="755" y2="870" stroke="#44647d" stroke-width="2"/>
+<line x1="125" y1="625" x2="125" y2="870" stroke="#44647d" stroke-width="2"/>
+<rect x="133.0" y="661.8" width="42.0" height="208.2" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="154.0" y="653.8" text-anchor="middle" class="tiny">0.812</text>
+<rect x="183.0" y="657.0" width="42.0" height="213.0" fill="#ff9d76" rx="7" ry="7"/>
+<text x="204.0" y="649.0" text-anchor="middle" class="tiny">0.831</text>
+<text x="178.4" y="894" text-anchor="middle" class="small">STARE</text>
+<text x="178.4" y="913" text-anchor="middle" class="tiny">Δ=+0.019</text>
+<rect x="263.8" y="664.6" width="42.0" height="205.4" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="284.8" y="656.6" text-anchor="middle" class="tiny">0.801</text>
+<rect x="313.8" y="663.1" width="42.0" height="206.9" fill="#ff9d76" rx="7" ry="7"/>
+<text x="334.8" y="655.1" text-anchor="middle" class="tiny">0.807</text>
+<text x="309.2" y="894" text-anchor="middle" class="small">RITE</text>
+<text x="309.2" y="913" text-anchor="middle" class="tiny">Δ=+0.006</text>
+<rect x="394.6" y="670.3" width="42.0" height="199.7" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="415.6" y="662.3" text-anchor="middle" class="tiny">0.779</text>
+<rect x="444.6" y="665.2" width="42.0" height="204.8" fill="#ff9d76" rx="7" ry="7"/>
+<text x="465.6" y="657.2" text-anchor="middle" class="tiny">0.799</text>
+<text x="440.0" y="894" text-anchor="middle" class="small">CHASE_DB1</text>
+<text x="440.0" y="913" text-anchor="middle" class="tiny">Δ=+0.020</text>
+<rect x="525.4" y="669.5" width="42.0" height="200.5" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="546.4" y="661.5" text-anchor="middle" class="tiny">0.782</text>
+<rect x="575.4" y="668.7" width="42.0" height="201.3" fill="#ff9d76" rx="7" ry="7"/>
+<text x="596.4" y="660.7" text-anchor="middle" class="tiny">0.785</text>
+<text x="570.8" y="894" text-anchor="middle" class="small">HRF</text>
+<text x="570.8" y="913" text-anchor="middle" class="tiny">Δ=+0.003</text>
+<rect x="656.2" y="660.5" width="42.0" height="209.5" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="677.2" y="652.5" text-anchor="middle" class="tiny">0.817</text>
+<rect x="706.2" y="658.5" width="42.0" height="211.5" fill="#ff9d76" rx="7" ry="7"/>
+<text x="727.2" y="650.5" text-anchor="middle" class="tiny">0.825</text>
+<text x="701.6" y="894" text-anchor="middle" class="small">AxonDeepSeg_SEM</text>
+<text x="701.6" y="913" text-anchor="middle" class="tiny">Δ=+0.008</text>
+<rect x="890" y="560" width="720" height="360" rx="20" ry="20" fill="#f8fbfd" stroke="#d7e4ee" stroke-width="2"/>
+<text x="915" y="594" class="paneltitle">95HD ↓</text>
+<line x1="945" y1="625.0" x2="1575" y2="625.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="629.0" text-anchor="end" class="tiny">19.57</text>
+<line x1="945" y1="686.2" x2="1575" y2="686.2" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="690.2" text-anchor="end" class="tiny">14.68</text>
+<line x1="945" y1="747.5" x2="1575" y2="747.5" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="751.5" text-anchor="end" class="tiny">9.79</text>
+<line x1="945" y1="808.8" x2="1575" y2="808.8" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="812.8" text-anchor="end" class="tiny">4.89</text>
+<line x1="945" y1="870.0" x2="1575" y2="870.0" stroke="#dbe6ef" stroke-width="1.4"/>
+<text x="935" y="874.0" text-anchor="end" class="tiny">0.00</text>
+<line x1="945" y1="870" x2="1575" y2="870" stroke="#44647d" stroke-width="2"/>
+<line x1="945" y1="625" x2="945" y2="870" stroke="#44647d" stroke-width="2"/>
+<rect x="953.0" y="695.6" width="42.0" height="174.4" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="974.0" y="687.6" text-anchor="middle" class="tiny">13.928</text>
+<rect x="1003.0" y="745.5" width="42.0" height="124.5" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1024.0" y="737.5" text-anchor="middle" class="tiny">9.944</text>
+<text x="998.4" y="894" text-anchor="middle" class="small">STARE</text>
+<text x="998.4" y="913" text-anchor="middle" class="tiny">Δ=+3.984</text>
+<rect x="1083.8" y="709.7" width="42.0" height="160.3" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1104.8" y="701.7" text-anchor="middle" class="tiny">12.808</text>
+<rect x="1133.8" y="720.5" width="42.0" height="149.5" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1154.8" y="712.5" text-anchor="middle" class="tiny">11.942</text>
+<text x="1129.2" y="894" text-anchor="middle" class="small">RITE</text>
+<text x="1129.2" y="913" text-anchor="middle" class="tiny">Δ=+0.866</text>
+<rect x="1214.6" y="657.0" width="42.0" height="213.0" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1235.6" y="649.0" text-anchor="middle" class="tiny">17.018</text>
+<rect x="1264.6" y="708.5" width="42.0" height="161.5" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1285.6" y="700.5" text-anchor="middle" class="tiny">12.899</text>
+<text x="1260.0" y="894" text-anchor="middle" class="small">CHASE_DB1</text>
+<text x="1260.0" y="913" text-anchor="middle" class="tiny">Δ=+4.119</text>
+<rect x="1345.4" y="769.7" width="42.0" height="100.3" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1366.4" y="761.7" text-anchor="middle" class="tiny">8.012</text>
+<rect x="1395.4" y="770.4" width="42.0" height="99.6" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1416.4" y="762.4" text-anchor="middle" class="tiny">7.953</text>
+<text x="1390.8" y="894" text-anchor="middle" class="small">HRF</text>
+<text x="1390.8" y="913" text-anchor="middle" class="tiny">Δ=+0.059</text>
+<rect x="1476.2" y="817.0" width="42.0" height="53.0" fill="#7fb3ff" rx="7" ry="7"/>
+<text x="1497.2" y="809.0" text-anchor="middle" class="tiny">4.233</text>
+<rect x="1526.2" y="818.0" width="42.0" height="52.0" fill="#ff9d76" rx="7" ry="7"/>
+<text x="1547.2" y="810.0" text-anchor="middle" class="tiny">4.152</text>
+<text x="1521.6" y="894" text-anchor="middle" class="small">AxonDeepSeg_SEM</text>
+<text x="1521.6" y="913" text-anchor="middle" class="tiny">Δ=+0.081</text>
+<text x="840" y="985" text-anchor="middle" class="small">注：除 95HD 外，其余指标越大越好；图中 Δ 表示 LSSegSAMLoRA 相对于 LSSeg 的提升幅度。</text>
+</svg>

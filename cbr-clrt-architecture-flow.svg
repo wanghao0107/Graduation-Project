@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1050" viewBox="0 0 1500 1050">
+  <defs>
+    <style>
+      .bg { fill: #f7f9fb; }
+      .title { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 32px; font-weight: 700; fill: #152238; }
+      .subtitle { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 18px; fill: #53657d; }
+      .section-title { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #1c2e45; }
+      .text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 17px; fill: #24364d; }
+      .small { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 14px; fill: #54657a; }
+      .formula { font-family: "Times New Roman", "Microsoft YaHei", serif; font-size: 15px; fill: #415269; }
+      .lane { fill: #ffffff; stroke: #d7e0ea; stroke-width: 1.6; rx: 12; }
+      .box { fill: #ffffff; stroke: #9fb4c8; stroke-width: 2; rx: 8; }
+      .input { fill: #eef7f1; stroke: #58a66b; }
+      .process { fill: #eef5ff; stroke: #4d82c8; }
+      .decision { fill: #fff7e8; stroke: #d4922f; }
+      .trace { fill: #f7efff; stroke: #8a63c7; }
+      .output { fill: #fff1f1; stroke: #cf6464; }
+      .feedback { fill: #effaf8; stroke: #3f9f92; }
+      .arrow { stroke: #53657d; stroke-width: 2.3; fill: none; marker-end: url(#arrow); }
+      .arrow-soft { stroke: #7a8da3; stroke-width: 2; fill: none; marker-end: url(#arrow); stroke-dasharray: 7 6; }
+      .yes { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #2d7a3f; }
+      .no { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #b06419; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#53657d"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#8aa0b8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect class="bg" width="1500" height="1050"/>
+  <text x="750" y="58" text-anchor="middle" class="title">CBR-CLRT 跨案例匹配与闭环根因追溯架构流程图</text>
+  <text x="750" y="88" text-anchor="middle" class="subtitle">以“结算主体 - 市场参与者 - 时间”为核心，实现案例检索、异常识别与分层根因追溯闭环</text>
+
+  <rect x="55" y="125" width="1390" height="205" class="lane" filter="url(#shadow)"/>
+  <text x="82" y="158" class="section-title">1. 输入与案例库</text>
+
+  <rect x="95" y="185" width="260" height="100" class="box input"/>
+  <text x="225" y="218" text-anchor="middle" class="text">当前待对账案例 Cq</text>
+  <text x="225" y="248" text-anchor="middle" class="small">提取 K、M、T、R、D、S</text>
+  <text x="225" y="270" text-anchor="middle" class="formula">K: 结算主体　M: 参与者　T: 时间</text>
+
+  <rect x="430" y="185" width="290" height="100" class="box input"/>
+  <text x="575" y="217" text-anchor="middle" class="text">历史案例库 𝓒</text>
+  <text x="575" y="247" text-anchor="middle" class="small">𝓒 = {C1, C2, ..., Cn}</text>
+  <text x="575" y="270" text-anchor="middle" class="small">正常 / 异常 / 待复核案例</text>
+
+  <rect x="795" y="185" width="320" height="100" class="box input"/>
+  <text x="955" y="217" text-anchor="middle" class="text">复合索引</text>
+  <text x="955" y="247" text-anchor="middle" class="formula">Kmajor → {MID} → [tstart, tend]</text>
+  <text x="955" y="270" text-anchor="middle" class="small">减少全库遍历开销</text>
+
+  <rect x="1190" y="185" width="210" height="100" class="box input"/>
+  <text x="1295" y="218" text-anchor="middle" class="text">候选案例集</text>
+  <text x="1295" y="248" text-anchor="middle" class="formula">Ccand</text>
+  <text x="1295" y="270" text-anchor="middle" class="small">满足主体、参与者、时间约束</text>
+
+  <path d="M355 235 H430" class="arrow"/>
+  <path d="M720 235 H795" class="arrow"/>
+  <path d="M1115 235 H1190" class="arrow"/>
+
+  <rect x="55" y="365" width="1390" height="225" class="lane" filter="url(#shadow)"/>
+  <text x="82" y="398" class="section-title">2. 跨案例匹配与相似度计算</text>
+
+  <rect x="95" y="435" width="300" height="105" class="box process"/>
+  <text x="245" y="466" text-anchor="middle" class="text">主体相似度 SimK</text>
+  <text x="245" y="496" text-anchor="middle" class="small">主体权重 + 匹配金额占比</text>
+  <text x="245" y="518" text-anchor="middle" class="formula">金额占比 &gt; 50% 时附加奖励</text>
+
+  <rect x="460" y="435" width="300" height="105" class="box process"/>
+  <text x="610" y="466" text-anchor="middle" class="text">参与者相似度 SimM</text>
+  <text x="610" y="496" text-anchor="middle" class="small">ID 匹配 / 隶属关系匹配</text>
+  <text x="610" y="518" text-anchor="middle" class="formula">SimM = 1.0 或 0.8λ</text>
+
+  <rect x="825" y="435" width="300" height="105" class="box process"/>
+  <text x="975" y="466" text-anchor="middle" class="text">时间相似度 SimT</text>
+  <text x="975" y="496" text-anchor="middle" class="small">时间重叠 + 粒度权重 + 延迟奖励</text>
+  <text x="975" y="518" text-anchor="middle" class="formula">|Ti∩Tq| / |Ti∪Tq| × ωt</text>
+
+  <rect x="1190" y="423" width="210" height="130" class="box process"/>
+  <text x="1295" y="456" text-anchor="middle" class="text">综合相似度</text>
+  <text x="1295" y="486" text-anchor="middle" class="formula">Sim(Cq,Ci)</text>
+  <text x="1295" y="510" text-anchor="middle" class="formula">= 0.4SimK + 0.35SimM</text>
+  <text x="1295" y="532" text-anchor="middle" class="formula">+ 0.25SimT</text>
+
+  <path d="M1295 285 V423" class="arrow"/>
+  <path d="M395 488 H460" class="arrow"/>
+  <path d="M760 488 H825" class="arrow"/>
+  <path d="M1125 488 H1190" class="arrow"/>
+
+  <rect x="55" y="625" width="1390" height="205" class="lane" filter="url(#shadow)"/>
+  <text x="82" y="658" class="section-title">3. 排序、一致性判定与异常触发</text>
+
+  <rect x="95" y="695" width="260" height="92" class="box process"/>
+  <text x="225" y="727" text-anchor="middle" class="text">相似度排序</text>
+  <text x="225" y="757" text-anchor="middle" class="small">筛选 Cmatch</text>
+  <text x="225" y="779" text-anchor="middle" class="formula">Sim(Cq,Ci) ≥ θs</text>
+
+  <polygon points="505,675 665,740 505,805 345,740" class="decision"/>
+  <text x="505" y="728" text-anchor="middle" class="text">是否存在</text>
+  <text x="505" y="754" text-anchor="middle" class="text">有效匹配案例？</text>
+
+  <rect x="755" y="695" width="245" height="92" class="box process"/>
+  <text x="878" y="727" text-anchor="middle" class="text">选择最优案例 C*</text>
+  <text x="878" y="757" text-anchor="middle" class="formula">arg max Sim(Cq,Ci)</text>
+
+  <rect x="1085" y="695" width="275" height="92" class="box decision"/>
+  <text x="1222" y="724" text-anchor="middle" class="text">差异率判定</text>
+  <text x="1222" y="754" text-anchor="middle" class="formula">δ = avg(|s* - sq| / max(...))</text>
+  <text x="1222" y="777" text-anchor="middle" class="formula">δ ≤ θδ ?</text>
+
+  <rect x="360" y="850" width="285" height="74" class="box output"/>
+  <text x="503" y="881" text-anchor="middle" class="text">低置信度新型案例</text>
+  <text x="503" y="907" text-anchor="middle" class="small">人工复核 / 后续保留</text>
+
+  <rect x="1165" y="850" width="210" height="74" class="box feedback"/>
+  <text x="1270" y="881" text-anchor="middle" class="text">对账正常</text>
+  <text x="1270" y="907" text-anchor="middle" class="small">输出一致性结论</text>
+
+  <path d="M1295 553 V610 C1295 630 225 630 225 695" class="arrow"/>
+  <path d="M355 741 H345" class="arrow"/>
+  <path d="M665 740 H755" class="arrow"/>
+  <text x="695" y="728" class="yes">是</text>
+  <path d="M505 805 V850" class="arrow"/>
+  <text x="520" y="838" class="no">否</text>
+  <path d="M1000 741 H1085" class="arrow"/>
+  <path d="M1222 787 V850" class="arrow"/>
+  <text x="1238" y="835" class="yes">δ ≤ θδ</text>
+
+  <rect x="55" y="865" width="1065" height="145" class="lane" filter="url(#shadow)"/>
+  <text x="82" y="898" class="section-title">4. 闭环根因追溯与案例回写</text>
+
+  <rect x="95" y="930" width="185" height="58" class="box trace"/>
+  <text x="188" y="955" text-anchor="middle" class="text">数据层</text>
+  <text x="188" y="977" text-anchor="middle" class="small">完整性 / 一致性</text>
+
+  <rect x="330" y="930" width="185" height="58" class="box trace"/>
+  <text x="423" y="955" text-anchor="middle" class="text">规则层</text>
+  <text x="423" y="977" text-anchor="middle" class="small">版本 / 参数 / 口径</text>
+
+  <rect x="565" y="930" width="185" height="58" class="box trace"/>
+  <text x="658" y="955" text-anchor="middle" class="text">算法层</text>
+  <text x="658" y="977" text-anchor="middle" class="small">权重 / 阈值 / 匹配</text>
+
+  <rect x="800" y="930" width="185" height="58" class="box trace"/>
+  <text x="893" y="955" text-anchor="middle" class="text">业务层</text>
+  <text x="893" y="977" text-anchor="middle" class="small">政策 / 特例 / 调整</text>
+
+  <rect x="1030" y="922" width="230" height="74" class="box output"/>
+  <text x="1145" y="950" text-anchor="middle" class="text">诊断结论</text>
+  <text x="1145" y="974" text-anchor="middle" class="small">异常类别、根因层级、证据链、处置方案</text>
+
+  <path d="M1085 770 C1020 835 835 875 188 930" class="arrow"/>
+  <text x="1030" y="833" class="no">δ &gt; θδ，触发追溯</text>
+  <path d="M280 959 H330" class="arrow"/>
+  <path d="M515 959 H565" class="arrow"/>
+  <path d="M750 959 H800" class="arrow"/>
+  <path d="M985 959 H1030" class="arrow"/>
+  <path d="M1145 922 C1145 850 1400 850 1400 285" class="arrow-soft"/>
+  <text x="1260" y="840" class="small">处置结果封装后回写案例库，实现经验沉淀与持续优化</text>
+</svg>

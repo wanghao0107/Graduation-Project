@@ -45,7 +45,7 @@ CURRENT_MODEL = 'LSSegSAMLoRA'
 # ============================================================
 # LSSegSAMLoRA 专用配置：手动指定 LSSeg 权重路径
 # ============================================================
-LSSEG_CHECKPOINT_PATH = "log/test_HRF_LSSeg 02-14 21_39/fold_2/model_weights_2.pth"
+LSSEG_CHECKPOINT_PATH = "log/test_AxonDeepSeg_SEM_LSSeg 03-02 15_55/fold_3/model_weights_3.pth"
 
 
 def with_loss_suffix(exp_name: str, config) -> str:
@@ -569,11 +569,11 @@ if __name__ == '__main__':
 
     config = {
         # 【优化】实验名称：明确标注端到端训练
-        'exp_name': 'test_HRF_LSSegSAMLoRA',
+        'exp_name': 'test_AxonDeepSeg_SEM_LSSegSAMLoRA',
         'outer_cv_num': 5,
         'inner_cv_num': 3,
         'random_state': 800,
-        'index_csv': 'data/idx_HRF.csv',
+        'index_csv': 'data/idx_AxonDeepSeg_SEM.csv',
         'image_resize': [512, 512],
         'num_epochs': 70,  # 【优化】端到端训练需要更多轮次，从 70 改为 100
         'n_trials': 40,     # 【当前配置】Optuna 搜索次数设为 40

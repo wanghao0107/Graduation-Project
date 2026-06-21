@@ -1,0 +1,108 @@
+<svg width="1400" height="1140" viewBox="0 0 1400 1140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .phase { font: 700 22px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .label { font: 700 18px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .text { font: 500 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #222222; }
+      .small { font: 500 14px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #333333; }
+      .goal { fill: #ffffff; stroke: #111111; stroke-width: 2.4; rx: 18; ry: 18; }
+      .band { fill: #f3f3f3; stroke: #444444; stroke-width: 1.6; rx: 16; ry: 16; }
+      .box { fill: #ffffff; stroke: #222222; stroke-width: 1.8; rx: 14; ry: 14; }
+      .arrow { stroke: #111111; stroke-width: 2.6; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 7 6; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#111111"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="1140" fill="#ffffff"/>
+
+  <rect x="350" y="48" width="700" height="88" class="goal"/>
+  <text x="700" y="84" text-anchor="middle" class="label">研究问题与目标</text>
+  <text x="700" y="114" text-anchor="middle" class="text">面向微观图像线状结构分割任务，提升分割精度、结构连续性与边界刻画能力</text>
+
+  <line x1="700" y1="136" x2="700" y2="174" class="arrow"/>
+
+  <rect x="90" y="174" width="1220" height="180" class="band"/>
+  <text x="700" y="210" text-anchor="middle" class="phase">第一阶段  理论分析与任务建模</text>
+
+  <rect x="140" y="240" width="350" height="84" class="box"/>
+  <text x="315" y="275" text-anchor="middle" class="label">任务特点分析</text>
+  <text x="315" y="301" text-anchor="middle" class="small">细小目标易遗漏、分支易断裂、边界模糊、背景干扰强</text>
+
+  <rect x="525" y="240" width="350" height="84" class="box"/>
+  <text x="700" y="275" text-anchor="middle" class="label">相关理论基础</text>
+  <text x="700" y="301" text-anchor="middle" class="small">医学图像分割、视觉 Transformer、SAM、LoRA</text>
+
+  <rect x="910" y="240" width="350" height="84" class="box"/>
+  <text x="1085" y="275" text-anchor="middle" class="label">研究切入点确定</text>
+  <text x="1085" y="301" text-anchor="middle" class="small">以“专用模型 + 基础模型适配”构建粗到细级联框架</text>
+
+  <line x1="315" y1="324" x2="315" y2="342" class="arrow dash"/>
+  <line x1="700" y1="324" x2="700" y2="342" class="arrow dash"/>
+  <line x1="1085" y1="324" x2="1085" y2="342" class="arrow dash"/>
+  <line x1="315" y1="342" x2="700" y2="342" class="arrow dash"/>
+  <line x1="1085" y1="342" x2="700" y2="342" class="arrow dash"/>
+  <line x1="700" y1="354" x2="700" y2="392" class="arrow"/>
+
+  <rect x="90" y="392" width="1220" height="224" class="band"/>
+  <text x="700" y="428" text-anchor="middle" class="phase">第二阶段  级联分割方法设计</text>
+
+  <rect x="120" y="480" width="250" height="96" class="box"/>
+  <text x="245" y="516" text-anchor="middle" class="label">LSSeg 粗分割模块</text>
+  <text x="245" y="542" text-anchor="middle" class="small">提取线状结构主体</text>
+  <text x="245" y="564" text-anchor="middle" class="small">获得稳定结构先验</text>
+
+  <rect x="435" y="480" width="250" height="96" class="box"/>
+  <text x="560" y="516" text-anchor="middle" class="label">Prompt 自动构造</text>
+  <text x="560" y="542" text-anchor="middle" class="small">由粗分割结果生成</text>
+  <text x="560" y="564" text-anchor="middle" class="small">mask prompt 与 box prompt</text>
+
+  <rect x="750" y="480" width="250" height="96" class="box"/>
+  <text x="875" y="516" text-anchor="middle" class="label">SAM-LoRA 精细分割</text>
+  <text x="875" y="542" text-anchor="middle" class="small">利用预训练视觉模型能力</text>
+  <text x="875" y="564" text-anchor="middle" class="small">细化边界与复杂分支</text>
+
+  <rect x="1065" y="480" width="210" height="96" class="box"/>
+  <text x="1170" y="516" text-anchor="middle" class="label">结果融合输出</text>
+  <text x="1170" y="542" text-anchor="middle" class="small">保留基线稳定性</text>
+  <text x="1170" y="564" text-anchor="middle" class="small">获得最终分割结果</text>
+
+  <line x1="370" y1="528" x2="435" y2="528" class="arrow"/>
+  <line x1="685" y1="528" x2="750" y2="528" class="arrow"/>
+  <line x1="1000" y1="528" x2="1065" y2="528" class="arrow"/>
+
+  <line x1="700" y1="576" x2="700" y2="654" class="arrow"/>
+
+  <rect x="90" y="654" width="1220" height="180" class="band"/>
+  <text x="700" y="690" text-anchor="middle" class="phase">第三阶段  关键策略优化</text>
+
+  <rect x="155" y="720" width="300" height="84" class="box"/>
+  <text x="305" y="755" text-anchor="middle" class="label">Prompt Bias 偏置增强</text>
+  <text x="305" y="781" text-anchor="middle" class="small">提高细小目标和弱边界区域的召回能力</text>
+
+  <rect x="550" y="720" width="300" height="84" class="box"/>
+  <text x="700" y="755" text-anchor="middle" class="label">融合机制设计</text>
+  <text x="700" y="781" text-anchor="middle" class="small">使细化分支在保留基线稳定性的基础上增量修正</text>
+
+  <rect x="945" y="720" width="300" height="84" class="box"/>
+  <text x="1095" y="755" text-anchor="middle" class="label">训练策略优化</text>
+  <text x="1095" y="781" text-anchor="middle" class="small">分层学习率、参数分组优化与鲁棒训练控制</text>
+
+  <line x1="700" y1="804" x2="700" y2="872" class="arrow"/>
+
+  <rect x="90" y="872" width="1220" height="156" class="band"/>
+  <text x="700" y="908" text-anchor="middle" class="phase">第四阶段  实验验证与综合分析</text>
+
+  <rect x="220" y="940" width="410" height="58" class="box"/>
+  <text x="425" y="976" text-anchor="middle" class="label">多公开数据集对比实验</text>
+
+  <rect x="770" y="940" width="410" height="58" class="box"/>
+  <text x="975" y="976" text-anchor="middle" class="label">消融实验与区域、结构、边界多指标评价</text>
+
+  <line x1="700" y1="1028" x2="700" y2="1070" class="arrow"/>
+
+  <rect x="350" y="1070" width="700" height="48" class="goal"/>
+  <text x="700" y="1101" text-anchor="middle" class="label">研究输出：构建稳定且精细的微观图像线状结构分割方法</text>
+</svg>

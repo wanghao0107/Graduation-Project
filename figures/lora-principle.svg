@@ -1,0 +1,46 @@
+<svg width="1200" height="380" viewBox="0 0 1200 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .frame { fill:#ffffff; stroke:#111111; stroke-width:1.6; rx:12; ry:12; }
+      .stage { fill:#f2f2f2; stroke:#777777; stroke-width:1.2; rx:10; ry:10; }
+      .box { fill:#ffffff; stroke:#222222; stroke-width:1.8; rx:12; ry:12; }
+      .label { font:700 20px 'Microsoft YaHei','PingFang SC',sans-serif; fill:#111111; }
+      .text { font:500 14px 'Microsoft YaHei','PingFang SC',sans-serif; fill:#222222; }
+      .arrow { stroke:#111111; stroke-width:2.2; fill:none; marker-end:url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#111111"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="380" fill="#ffffff"/>
+  <rect x="18" y="22" width="1164" height="336" class="frame"/>
+  <rect x="48" y="48" width="1104" height="46" class="stage"/>
+  <text x="600" y="78" text-anchor="middle" class="label">LoRA 低秩适配结构</text>
+
+  <rect x="62" y="138" width="154" height="104" class="box"/>
+  <text x="139" y="178" text-anchor="middle" class="label">输入特征</text>
+  <text x="139" y="206" text-anchor="middle" class="text">x</text>
+
+  <rect x="286" y="120" width="224" height="140" class="box"/>
+  <text x="398" y="162" text-anchor="middle" class="label">冻结原始权重</text>
+  <text x="398" y="192" text-anchor="middle" class="text">W</text>
+  <text x="398" y="218" text-anchor="middle" class="text">保留预训练参数</text>
+
+  <rect x="584" y="118" width="250" height="96" class="box"/>
+  <text x="709" y="156" text-anchor="middle" class="label">低秩矩阵 A</text>
+  <text x="709" y="184" text-anchor="middle" class="text">A ∈ R^(r × k)</text>
+
+  <rect x="584" y="232" width="250" height="96" class="box"/>
+  <text x="709" y="270" text-anchor="middle" class="label">低秩矩阵 B</text>
+  <text x="709" y="298" text-anchor="middle" class="text">B ∈ R^(d × r)</text>
+
+  <rect x="916" y="138" width="220" height="104" class="box"/>
+  <text x="1026" y="178" text-anchor="middle" class="label">适配后输出</text>
+  <text x="1026" y="206" text-anchor="middle" class="text">W + (α / r)BA</text>
+
+  <line x1="216" y1="190" x2="286" y2="190" class="arrow"/>
+  <line x1="510" y1="190" x2="584" y2="166" class="arrow"/>
+  <line x1="510" y1="190" x2="584" y2="280" class="arrow"/>
+  <line x1="834" y1="166" x2="916" y2="174" class="arrow"/>
+  <line x1="834" y1="280" x2="916" y2="206" class="arrow"/>
+</svg>

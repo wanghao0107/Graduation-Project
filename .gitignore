@@ -1,4 +1,5 @@
-__pycache__
+__pycache__/
+**/__pycache__/
 data/
 log/
 optuna.db
@@ -7,6 +8,8 @@ optuna.db
 
 # IDE
 .idea/
+.vscode/
+.codex
 
 # Windows Zone Identifier
 *:Zone.Identifier

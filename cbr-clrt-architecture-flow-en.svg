@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1280" viewBox="0 0 1800 1280">
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .title { font-family: Arial, Helvetica, sans-serif; font-size: 34px; font-weight: 700; fill: #18263a; }
+      .subtitle { font-family: Arial, Helvetica, sans-serif; font-size: 18px; fill: #596b82; }
+      .lane { fill: #ffffff; stroke: #d6e0eb; stroke-width: 1.6; rx: 12; }
+      .laneTitle { font-family: Arial, Helvetica, sans-serif; font-size: 21px; font-weight: 700; fill: #21324a; }
+      .box { fill: #ffffff; stroke: #97adc5; stroke-width: 2; rx: 8; }
+      .input { fill: #eef8f2; stroke: #57a76b; }
+      .process { fill: #eef5ff; stroke: #4f82c7; }
+      .decision { fill: #fff7e8; stroke: #d29432; }
+      .trace { fill: #f6efff; stroke: #8964c8; }
+      .output { fill: #fff1f1; stroke: #ce6767; }
+      .feedback { fill: #effaf7; stroke: #42a08f; }
+      .nodeTitle { font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; fill: #23354f; }
+      .nodeText { font-family: Arial, Helvetica, sans-serif; font-size: 15px; fill: #465872; }
+      .formula { font-family: "Times New Roman", Times, serif; font-size: 15px; fill: #344961; }
+      .small { font-family: Arial, Helvetica, sans-serif; font-size: 13px; fill: #64758c; }
+      .arrow { stroke: #53677f; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .arrowSoft { stroke: #7589a1; stroke-width: 2.1; fill: none; marker-end: url(#arrow); stroke-dasharray: 8 7; }
+      .labelYes { font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; fill: #2f8145; }
+      .labelNo { font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; fill: #ba6a1b; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#53677f"/>
+    </marker>
+    <filter id="shadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#8da1b8" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect class="bg" width="1800" height="1280"/>
+  <text x="900" y="58" text-anchor="middle" class="title">CBR-CLRT Cross-Case Matching and Closed-Loop Root Cause Tracing</text>
+  <text x="900" y="88" text-anchor="middle" class="subtitle">Architecture flow based on settlement entity, market participant, and time</text>
+
+  <!-- Lane 1 -->
+  <rect x="70" y="125" width="1660" height="210" class="lane" filter="url(#shadow)"/>
+  <text x="100" y="160" class="laneTitle">1. Case Input and Candidate Retrieval</text>
+
+  <rect x="115" y="195" width="285" height="92" class="box input"/>
+  <text x="258" y="226" text-anchor="middle" class="nodeTitle">Current Case Cq</text>
+  <text x="258" y="252" text-anchor="middle" class="nodeText">Extract K, M, T, R, D, S</text>
+  <text x="258" y="274" text-anchor="middle" class="small">K: entity | M: participant | T: time</text>
+
+  <rect x="485" y="195" width="285" height="92" class="box input"/>
+  <text x="628" y="226" text-anchor="middle" class="nodeTitle">Historical Case Base C</text>
+  <text x="628" y="252" text-anchor="middle" class="formula">C = {C1, C2, ..., Cn}</text>
+  <text x="628" y="274" text-anchor="middle" class="small">normal, abnormal, pending cases</text>
+
+  <rect x="855" y="195" width="330" height="92" class="box input"/>
+  <text x="1020" y="226" text-anchor="middle" class="nodeTitle">Composite Index</text>
+  <text x="1020" y="252" text-anchor="middle" class="formula">Kmajor -> {M_ID} -> [t_start, t_end]</text>
+  <text x="1020" y="274" text-anchor="middle" class="small">limits the search scope</text>
+
+  <rect x="1270" y="195" width="285" height="92" class="box input"/>
+  <text x="1413" y="226" text-anchor="middle" class="nodeTitle">Candidate Set</text>
+  <text x="1413" y="252" text-anchor="middle" class="formula">C_cand</text>
+  <text x="1413" y="274" text-anchor="middle" class="small">entity, participant, and time constraints</text>
+
+  <path d="M400 241 H485" class="arrow"/>
+  <path d="M770 241 H855" class="arrow"/>
+  <path d="M1185 241 H1270" class="arrow"/>
+
+  <!-- Lane 2 -->
+  <rect x="70" y="375" width="1660" height="250" class="lane" filter="url(#shadow)"/>
+  <text x="100" y="410" class="laneTitle">2. Local Similarity and Weighted Fusion</text>
+
+  <rect x="115" y="465" width="300" height="100" class="box process"/>
+  <text x="265" y="497" text-anchor="middle" class="nodeTitle">Entity Similarity</text>
+  <text x="265" y="523" text-anchor="middle" class="formula">Sim_K</text>
+  <text x="265" y="546" text-anchor="middle" class="nodeText">entity weight + matched amount ratio</text>
+
+  <rect x="505" y="465" width="300" height="100" class="box process"/>
+  <text x="655" y="497" text-anchor="middle" class="nodeTitle">Participant Similarity</text>
+  <text x="655" y="523" text-anchor="middle" class="formula">Sim_M = 1.0 or 0.8 lambda</text>
+  <text x="655" y="546" text-anchor="middle" class="nodeText">ID match or affiliation match</text>
+
+  <rect x="895" y="465" width="300" height="100" class="box process"/>
+  <text x="1045" y="497" text-anchor="middle" class="nodeTitle">Time Similarity</text>
+  <text x="1045" y="523" text-anchor="middle" class="formula">Sim_T</text>
+  <text x="1045" y="546" text-anchor="middle" class="nodeText">overlap + granularity + delay reward</text>
+
+  <rect x="1285" y="455" width="315" height="120" class="box process"/>
+  <text x="1443" y="486" text-anchor="middle" class="nodeTitle">Comprehensive Similarity</text>
+  <text x="1443" y="514" text-anchor="middle" class="formula">Sim(Cq, Ci)</text>
+  <text x="1443" y="539" text-anchor="middle" class="formula">= 0.4 Sim_K + 0.35 Sim_M</text>
+  <text x="1443" y="562" text-anchor="middle" class="formula">+ 0.25 Sim_T</text>
+
+  <path d="M1413 287 V385 Q1413 425 1443 455" class="arrow"/>
+  <path d="M415 515 H505" class="arrow"/>
+  <path d="M805 515 H895" class="arrow"/>
+  <path d="M1195 515 H1285" class="arrow"/>
+
+  <!-- Lane 3 -->
+  <rect x="70" y="665" width="1660" height="285" class="lane" filter="url(#shadow)"/>
+  <text x="100" y="700" class="laneTitle">3. Matching Decision and Anomaly Trigger</text>
+
+  <rect x="115" y="760" width="280" height="95" class="box process"/>
+  <text x="255" y="792" text-anchor="middle" class="nodeTitle">Rank Candidates</text>
+  <text x="255" y="819" text-anchor="middle" class="formula">C_match = {Ci | Sim >= theta_s}</text>
+  <text x="255" y="842" text-anchor="middle" class="nodeText">keep valid matched cases</text>
+
+  <polygon points="570,735 710,807 570,879 430,807" class="decision"/>
+  <text x="570" y="800" text-anchor="middle" class="nodeTitle">Any Valid</text>
+  <text x="570" y="826" text-anchor="middle" class="nodeTitle">Match?</text>
+
+  <rect x="785" y="760" width="270" height="95" class="box process"/>
+  <text x="920" y="792" text-anchor="middle" class="nodeTitle">Select Best Case</text>
+  <text x="920" y="820" text-anchor="middle" class="formula">C* = arg max Sim(Cq, Ci)</text>
+  <text x="920" y="842" text-anchor="middle" class="nodeText">best historical reference</text>
+
+  <rect x="1135" y="760" width="300" height="95" class="box decision"/>
+  <text x="1285" y="792" text-anchor="middle" class="nodeTitle">Difference Rate</text>
+  <text x="1285" y="820" text-anchor="middle" class="formula">delta = avg(|s* - sq| / max(...))</text>
+  <text x="1285" y="842" text-anchor="middle" class="formula">delta &lt;= theta_delta ?</text>
+
+  <rect x="1510" y="760" width="170" height="95" class="box feedback"/>
+  <text x="1595" y="795" text-anchor="middle" class="nodeTitle">Normal</text>
+  <text x="1595" y="823" text-anchor="middle" class="nodeText">consistent</text>
+  <text x="1595" y="845" text-anchor="middle" class="nodeText">settlement result</text>
+
+  <rect x="430" y="895" width="280" height="42" class="box output"/>
+  <text x="570" y="921" text-anchor="middle" class="nodeText">Low-confidence new case / manual review</text>
+
+  <path d="M1443 575 V642 Q1443 705 255 760" class="arrow"/>
+  <path d="M395 807 H430" class="arrow"/>
+  <path d="M710 807 H785" class="arrow"/>
+  <text x="735" y="793" class="labelYes">YES</text>
+  <path d="M570 879 V895" class="arrow"/>
+  <text x="590" y="888" class="labelNo">NO</text>
+  <path d="M1055 807 H1135" class="arrow"/>
+  <path d="M1435 807 H1510" class="arrow"/>
+  <text x="1454" y="793" class="labelYes">YES</text>
+
+  <!-- Lane 4 -->
+  <rect x="70" y="990" width="1660" height="230" class="lane" filter="url(#shadow)"/>
+  <text x="100" y="1025" class="laneTitle">4. Closed-Loop Root Cause Tracing and Case Retention</text>
+
+  <rect x="115" y="1085" width="200" height="80" class="box trace"/>
+  <text x="215" y="1116" text-anchor="middle" class="nodeTitle">Data Layer</text>
+  <text x="215" y="1142" text-anchor="middle" class="nodeText">integrity, accuracy,</text>
+  <text x="215" y="1162" text-anchor="middle" class="nodeText">consistency</text>
+
+  <rect x="385" y="1085" width="200" height="80" class="box trace"/>
+  <text x="485" y="1116" text-anchor="middle" class="nodeTitle">Rule Layer</text>
+  <text x="485" y="1142" text-anchor="middle" class="nodeText">version, parameters,</text>
+  <text x="485" y="1162" text-anchor="middle" class="nodeText">formula path</text>
+
+  <rect x="655" y="1085" width="200" height="80" class="box trace"/>
+  <text x="755" y="1116" text-anchor="middle" class="nodeTitle">Algorithm Layer</text>
+  <text x="755" y="1142" text-anchor="middle" class="nodeText">weights, thresholds,</text>
+  <text x="755" y="1162" text-anchor="middle" class="nodeText">matching logic</text>
+
+  <rect x="925" y="1085" width="200" height="80" class="box trace"/>
+  <text x="1025" y="1116" text-anchor="middle" class="nodeTitle">Business Layer</text>
+  <text x="1025" y="1142" text-anchor="middle" class="nodeText">policy, exceptions,</text>
+  <text x="1025" y="1162" text-anchor="middle" class="nodeText">manual adjustments</text>
+
+  <rect x="1195" y="1078" width="245" height="94" class="box output"/>
+  <text x="1318" y="1109" text-anchor="middle" class="nodeTitle">Diagnosis</text>
+  <text x="1318" y="1135" text-anchor="middle" class="nodeText">category, root cause,</text>
+  <text x="1318" y="1156" text-anchor="middle" class="nodeText">evidence, action plan</text>
+
+  <rect x="1510" y="1078" width="170" height="94" class="box feedback"/>
+  <text x="1595" y="1112" text-anchor="middle" class="nodeTitle">Case Retention</text>
+  <text x="1595" y="1139" text-anchor="middle" class="nodeText">write back</text>
+  <text x="1595" y="1160" text-anchor="middle" class="nodeText">to case base</text>
+
+  <path d="M1285 855 V960 Q1285 1040 215 1085" class="arrow"/>
+  <text x="1305" y="972" class="labelNo">NO: delta > theta_delta</text>
+  <text x="1305" y="994" class="small">trigger root cause tracing</text>
+  <path d="M315 1125 H385" class="arrow"/>
+  <path d="M585 1125 H655" class="arrow"/>
+  <path d="M855 1125 H925" class="arrow"/>
+  <path d="M1125 1125 H1195" class="arrow"/>
+  <path d="M1440 1125 H1510" class="arrow"/>
+  <path d="M1595 1078 C1595 1035 1710 1015 1710 930 L1710 325 C1710 270 1630 245 1555 245" class="arrowSoft"/>
+  <text x="1400" y="1210" class="small">Resolved cases are retained to improve future retrieval and tracing.</text>
+</svg>
